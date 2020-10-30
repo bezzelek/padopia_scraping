@@ -11,8 +11,8 @@ from shutil import which
 
 BOT_NAME = 'webscraper'
 
-SPIDER_MODULES = ['webscraper.webscraper.spiders']
-NEWSPIDER_MODULE = 'webscraper.webscraper.spiders'
+SPIDER_MODULES = ['src.webscraper.spiders']
+NEWSPIDER_MODULE = 'src.webscraper.spiders'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -21,12 +21,19 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
     'scrapy_selenium.SeleniumMiddleware': 800,
+    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
 }
 
 SELENIUM_DRIVER_NAME = 'chrome'
 SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
 SELENIUM_DRIVER_ARGUMENTS = ['--headless']  # '--headless' if using chrome instead of firefox
 
+# ROTATING_PROXY_LIST_PATH = 'proxy.txt'
+# ROTATING_PROXY_PAGE_RETRY_TIMES = 100
+# ROTATING_PROXY_LOGSTATS_INTERVAL = 5
+# ROTATING_PROXY_BACKOFF_BASE = 2
+# ROTATING_PROXY_BACKOFF_CAP = 4
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'webscraper (+http://www.yourdomain.com)'
