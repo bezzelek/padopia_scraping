@@ -6,9 +6,8 @@
 import scrapy
 
 
-class WebscraperItem(scrapy.Item):
+class PropertyItem(scrapy.Item):
     # define the fields for your item here like:
-
     property_link = scrapy.Field()
     property_address = scrapy.Field()
     property_cost = scrapy.Field()
@@ -18,12 +17,24 @@ class WebscraperItem(scrapy.Item):
     property_type = scrapy.Field()
     property_description = scrapy.Field()
     property_overview = scrapy.Field()
+    property_facilities = scrapy.Field()
     property_features = scrapy.Field()
+    property_photo = scrapy.Field()
+    property_photos = scrapy.Field()
     property_renewed = scrapy.Field()
-    property_views = scrapy.Field()
     property_shorter = scrapy.Field()
     property_agent = scrapy.Field()
     property_agent_photo = scrapy.Field()
+    property_agency_licence = scrapy.Field()
     property_agency_link = scrapy.Field()
+    pass
 
+
+class AgencyItem(scrapy.Item):
+    agency_name = scrapy.Field()
+    agency_logo = scrapy.Field()
+    agency_overview = scrapy.Field()
+    agency_licence_number = scrapy.Field()
+    agency_details = scrapy.Field()
+    agency_agents_details = scrapy.Field()
     pass
