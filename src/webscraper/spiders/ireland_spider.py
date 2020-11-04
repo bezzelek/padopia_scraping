@@ -1,36 +1,51 @@
 import scrapy
+
+from logging import getLogger
+from datetime import datetime
+
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from scrapy_selenium import SeleniumRequest
+from apscheduler.schedulers.twisted import TwistedScheduler
+
+
+logger = getLogger()
 
 
 class IrelandSpider(scrapy.Spider):
+    logger.info('Launching Ireland spider...')
     name = 'ireland'
     start_urls = [
         'https://www.daft.ie/ireland/property-for-sale/?s%5Badvanced%5D=1&searchSource=sale&offset=00'
     ]
 
-    custom_settings = {
-        'FEED_FORMAT': 'json',
-        'FEED_URI': 'data.json'
-    }
+    """JSON output just for testing"""
+    # custom_settings = {
+    #     'FEED_FORMAT': 'json',
+    #     'FEED_URI': 'data.json'
+    # }
 
     def parse(self, response, **kwargs):
+        logger.info('Starting to scrap...')
         home_page = 'https://www.daft.ie'
         property_urls = response.css(
             "a.PropertyInformationCommonStyles__propertyPrice--link::attr(href)"
         ).extract()
         for url in property_urls:
             property_page = home_page + url
+            logger.info('Going to property page...')
             yield scrapy.Request(url=property_page, callback=self.parse_property_content)
 
+        """Follow the pagination"""
         # next_url = response.css('li.next_page a::attr(href)').get()
         # next_page = home_page + next_url
         # if next_page is not None:
+        #     logger.info('Following pagination and going to nex page...')
         #     yield response.follow(next_page, callback=self.parse)
 
     def parse_property_content(self, response, **kwargs):
+        logger.info('Scraping property page...')
         items = PropertyItem()
 
         property_link = response.xpath('/html/head/meta[29]/@content').extract()
@@ -71,6 +86,7 @@ class IrelandSpider(scrapy.Spider):
         property_agent_photo = response.xpath("//aside/div[1]/div/div[1]/div/img/@src").extract()
         property_agency_licence = response.xpath('//aside/section/div[3]/span/text()').extract()
         property_agency_link = response.xpath('/html/body/div[10]/div[2]/div[2]/aside/section/h4/a/@href').get()
+        date_time = datetime.utcnow()
 
         items['property_link'] = property_link
         items['property_address'] = property_address
@@ -91,13 +107,18 @@ class IrelandSpider(scrapy.Spider):
         items['property_agent_photo'] = property_agent_photo
         items['property_agency_licence'] = property_agency_licence
         items['property_agency_link'] = property_agency_link
+        items['date_time'] = date_time
 
+        """Go to agency page"""
         if property_agency_link is not None:
+            logger.info('Going to agency page...')
             yield SeleniumRequest(url=property_agency_link, callback=self.parse_agency_content)
 
+        logger.info('Yielding new property item...')
         yield items
 
     def parse_agency_content(self, response, **kwargs):
+        logger.info('Scraping agency page...')
         items = AgencyItem()
 
         agency_name = response.xpath('//*[@id="gc_content"]/h1/text()').extract()
@@ -114,6 +135,7 @@ class IrelandSpider(scrapy.Spider):
         agency_details_extract = response.xpath('//*[@id="gc_content"]/p/text()').extract()
         agency_details = ''.join(agency_details_extract).strip()
 
+        """Scrap table"""
         agency_agents_details = {
             'name': [],
             'phone': [],
@@ -128,6 +150,7 @@ class IrelandSpider(scrapy.Spider):
             agency_agents_details['name'].append(name)
             agency_agents_details['phone'].append(phone)
             agency_agents_details['add_info'].append(add_info)
+        date_time = datetime.utcnow()
 
         items['agency_name'] = agency_name
         items['agency_logo'] = agency_logo
@@ -135,11 +158,19 @@ class IrelandSpider(scrapy.Spider):
         items['agency_licence_number'] = agency_licence_number
         items['agency_details'] = agency_details
         items['agency_agents_details'] = agency_agents_details
+        items['date_time'] = date_time
 
+        logger.info('Yielding new agency item...')
         yield items
 
 
+"""Launch script"""
 if __name__ == "__main__":
     process = CrawlerProcess(get_project_settings())
+    """Scheduler to run task periodically"""
+    # scheduler = TwistedScheduler()
+    # scheduler.add_job(process.crawl, 'interval', args=[IrelandSpider], seconds=60*60*24)
+    # scheduler.start()
+    # process.start(False)
     process.crawl(IrelandSpider)
     process.start()
