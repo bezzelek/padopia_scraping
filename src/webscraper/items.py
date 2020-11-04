@@ -27,6 +27,7 @@ class PropertyItem(scrapy.Item):
     property_agent_photo = scrapy.Field()
     property_agency_licence = scrapy.Field()
     property_agency_link = scrapy.Field()
+    date_time = scrapy.Field()
     pass
 
 
@@ -37,4 +38,5 @@ class AgencyItem(scrapy.Item):
     agency_licence_number = scrapy.Field()
     agency_details = scrapy.Field()
     agency_agents_details = scrapy.Field()
+    date_time = scrapy.Field()
     pass

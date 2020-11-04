@@ -6,7 +6,7 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-
+"""Import for selenium"""
 from shutil import which
 
 BOT_NAME = 'webscraper'
@@ -14,26 +14,44 @@ BOT_NAME = 'webscraper'
 SPIDER_MODULES = ['src.webscraper.spiders']
 NEWSPIDER_MODULE = 'src.webscraper.spiders'
 
-# Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
+"""Middlewares for useragent, rotating proxies and selenium"""
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
     'scrapy_selenium.SeleniumMiddleware': 800,
-    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
-    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 560,
+    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 570,
 }
 
+"""DB settings"""
+DB_CONNECTION = "mongodb+srv://admin:ecGywjNuyawbdGOdofaE6HndvE6L7l@cluster0.ry6ww.mongodb.net/<dbname>?retryWrites=true&w=majority"
+ITEM_PIPELINES = {
+    'webscraper.pipelines.PropertyPipeline': 300,
+}
+
+"""Selenium settings"""
 SELENIUM_DRIVER_NAME = 'chrome'
 SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
 SELENIUM_DRIVER_ARGUMENTS = ['--headless']  # '--headless' if using chrome instead of firefox
 
+"""Base file layout"""
 # ROTATING_PROXY_LIST_PATH = 'proxy.txt'
 # ROTATING_PROXY_PAGE_RETRY_TIMES = 100
 # ROTATING_PROXY_LOGSTATS_INTERVAL = 5
 # ROTATING_PROXY_BACKOFF_BASE = 2
 # ROTATING_PROXY_BACKOFF_CAP = 4
+# 
+# RANDOMIZE_DOWNLOAD_DELAY = True
+# COOKIES_ENABLED = False
+# # CONCURRENT_ITEMS = 200
+# CONCURRENT_REQUESTS=50
+# DOWNLOAD_DELAY= 0
+# CONCURRENT_REQUESTS_PER_DOMAIN=50
+# # LOG_LEVEL = 'ERROR'
+# RETRY_TIMES = 2
+# CONNECTION_TIMEOUT = 30
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'webscraper (+http://www.yourdomain.com)'
