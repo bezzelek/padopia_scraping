@@ -22,10 +22,10 @@ class PropertyPipeline(object):
 
     def process_item(self, item, spider):
         """Delete old records from db"""
-        logger.info('Deleting old records...')
+        # logger.info('Deleting old records...')
         # yesterday = datetime.utcnow() - timedelta(days=1)
-        past_hour = datetime.utcnow() - timedelta(minutes=60)
-        self.collection_property.remove({"date_time": {"$lt": past_hour}})
+        # past_hour = datetime.utcnow() - timedelta(minutes=1)
+        # self.collection_property.remove({"date_time": {"$lt": past_hour}})
 
         """If we receive property items we put them to property collection"""
         if isinstance(item, PropertyItem):
@@ -54,6 +54,7 @@ class PropertyPipeline(object):
                 logger.info('Updating existing agency...')
                 self.collection_agencies.update_one({"agency_name": {"$eq": agency_name_item}},
                                                     {"$set": dict(item)})
+
             else:
                 """Put new agency item to db"""
                 logger.info('Adding new agency to database...')

@@ -11,6 +11,8 @@ class PropertyItem(scrapy.Item):
     property_link = scrapy.Field()
     property_address = scrapy.Field()
     property_cost = scrapy.Field()
+    property_cost_integer = scrapy.Field()
+    property_cost_currency = scrapy.Field()
     property_eircode = scrapy.Field()
     property_bedrooms = scrapy.Field()
     property_bathrooms = scrapy.Field()
@@ -34,6 +36,7 @@ class PropertyItem(scrapy.Item):
 class AgencyItem(scrapy.Item):
     agency_name = scrapy.Field()
     agency_logo = scrapy.Field()
+    agency_link = scrapy.Field()
     agency_overview = scrapy.Field()
     agency_licence_number = scrapy.Field()
     agency_details = scrapy.Field()

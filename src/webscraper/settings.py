@@ -16,6 +16,8 @@ NEWSPIDER_MODULE = 'src.webscraper.spiders'
 
 ROBOTSTXT_OBEY = True
 
+CONCURRENT_REQUESTS = 5
+
 """Middlewares for useragent, rotating proxies and selenium"""
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
@@ -26,7 +28,7 @@ DOWNLOADER_MIDDLEWARES = {
 }
 
 """DB settings"""
-DB_CONNECTION = "mongodb+srv://admin:ecGywjNuyawbdGOdofaE6HndvE6L7l@cluster0.ry6ww.mongodb.net/<dbname>?retryWrites=true&w=majority"
+DB_CONNECTION = "mongodb+srv://padopiadbuser:WZHZbvqLq5kf4gDyHkzG@padopiacluster.p0hcr.mongodb.net/<dbname>?retryWrites=true&w=majority"
 ITEM_PIPELINES = {
     'webscraper.pipelines.PropertyPipeline': 300,
 }
