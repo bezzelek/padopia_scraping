@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  scraper_launch:
+    container_name: scraper
+    build: .
+    image: padopia-service:dev
+    volumes:
+    - .:/app

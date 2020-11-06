@@ -137,10 +137,3 @@ geckodriver.log
 WHO-COVID-19-global-data.csv
 celerybeat-schedule.*
 docker-compose.prod.yaml
-
-
-/scrapper
-old_file.py
-docker-compose.yaml
-Dockerfile
-Makefile
