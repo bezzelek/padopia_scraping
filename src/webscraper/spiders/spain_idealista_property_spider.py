@@ -8,9 +8,10 @@ from shutil import which
 
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
-from src.webscraper.items import PropertyItem, AgencyItem
 from scrapy_selenium import SeleniumRequest
 
+from src.webscraper.items import PropertyItem
+from webscraper.proxies import get_proxies
 
 logger = getLogger()
 
@@ -23,31 +24,41 @@ class SpainIdealistaPropertySpider(scrapy.Spider):
     ]
 
     custom_settings = {
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
-        'DOWNLOAD_DELAY': 2,
+        # 'CONCURRENT_REQUESTS_PER_DOMAIN': 5,
+        # 'DOWNLOAD_DELAY': 1,
+        'DOWNLOAD_TIMEOUT': 10,
         'SELENIUM_DRIVER_NAME': 'chrome',
         'SELENIUM_DRIVER_EXECUTABLE_PATH': which('chromedriver'),
         'SELENIUM_DRIVER_ARGUMENTS': ['--headless'],
-        # 'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 403, 404, 408],
+        'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 403, 404, 408],
+
+        'ROTATING_PROXY_PAGE_RETRY_TIMES': 1000,
+        # 'ROTATING_PROXY_LOGSTATS_INTERVAL': 5,
+        # 'ROTATING_PROXY_BACKOFF_BASE': 2,
+        # 'ROTATING_PROXY_BACKOFF_CAP': 4,
+        'ROTATING_PROXY_LIST': get_proxies(),
         'DOWNLOADER_MIDDLEWARES': {
             'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
             'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+            'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+            'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
             'scrapy_selenium.SeleniumMiddleware': 800,
         },
         'DEFAULT_REQUEST_HEADERS': {
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en-US,en;q=0.9,uk;q=0.8,ru;q=0.7',
-            'cache-control': 'no-cache',
-            'cookie': """userUUID=8d0a0864-60cc-4563-82bf-09d941e38972; _pxhd=726472888aab5634a104e4e4a9953b7baa9bd38461656f44d6598f0f20de8bd8:813d7731-2271-11eb-b49e-d3e4982fe922; cookieDirectiveClosed=true; askToSaveAlertPopUp=true; cookieSearch-1="/venta-viviendas/a-coruna-provincia/:1604918608875"; contact0058accd-f0bb-4fc3-89e6-d1b6cbcb6c0f="{'email':null,'phone':null,'phonePrefix':null,'friendEmails':null,'name':null,'message':null,'message2Friends':null,'maxNumberContactsAllow':10,'defaultMessage':true}"; send0058accd-f0bb-4fc3-89e6-d1b6cbcb6c0f="{'friendsEmail':null,'email':null,'message':null}"; SESSION=eb523ad3-bee4-4587-bb3b-f92003d4d811; WID=25eeb419b37ff161|X6pt7|X6pmh)""",
-            'pragma': 'no-cache',
-            'referer': 'https://www.idealista.com/en/pro/lapalmacompraventa/',
+            # 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            # 'accept-encoding': 'gzip, deflate, br',
+            # 'accept-language': 'en-US,en;q=0.9,uk;q=0.8,ru;q=0.7',
+            # 'cache-control': 'no-cache',
+            # 'cookie': """userUUID=8d0a0864-60cc-4563-82bf-09d941e38972; _pxhd=726472888aab5634a104e4e4a9953b7baa9bd38461656f44d6598f0f20de8bd8:813d7731-2271-11eb-b49e-d3e4982fe922; cookieDirectiveClosed=true; askToSaveAlertPopUp=true; cookieSearch-1="/venta-viviendas/a-coruna-provincia/:1605188918284"; contact5d458417-52c4-4135-868a-8ea5107b244c="{'email':null,'phone':null,'phonePrefix':null,'friendEmails':null,'name':null,'message':null,'message2Friends':null,'maxNumberContactsAllow':10,'defaultMessage':true}"; send5d458417-52c4-4135-868a-8ea5107b244c="{'friendsEmail':null,'email':null,'message':null}"; SESSION=20e49b7c-125b-419f-b8c3-b54a7d0bc15a; WID=503ae74b1083bcf5|X61gB|X61gB""",
+            # 'pragma': 'no-cache',
+            # 'referer': 'https://www.idealista.com/en/',
             'sec-fetch-dest': 'document',
             'sec-fetch-mode': 'navigate',
-            'sec-fetch-site': 'same-origin',
+            'sec-fetch-site': 'none',
             'sec-fetch-user': '?1',
             'upgrade-insecure-requests': '1',
-            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36',
+            'authority': 'www.idealista.com',
+            # 'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36',
         }
     }
 

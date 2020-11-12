@@ -1,6 +1,14 @@
+# Scrapy
 scrapy==2.4.0
 scrapy-user-agents==0.1.1
 scrapy-selenium==0.0.7
 scrapy-rotating-proxies==0.6.2
 apscheduler==3.6.3
+
+# Database
 pymongo==3.11.0
+
+# Required for propie def()
+requests==2.25.0
+lxml==4.6.1
+itemadapter==0.2.0
