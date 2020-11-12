@@ -14,18 +14,7 @@ BOT_NAME = 'webscraper'
 SPIDER_MODULES = ['src.webscraper.spiders']
 NEWSPIDER_MODULE = 'src.webscraper.spiders'
 
-ROBOTSTXT_OBEY = True
-
-CONCURRENT_REQUESTS = 5
-
-"""Middlewares for useragent, rotating proxies and selenium"""
-DOWNLOADER_MIDDLEWARES = {
-    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
-    'scrapy_selenium.SeleniumMiddleware': 800,
-    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 560,
-    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 570,
-}
+ROBOTSTXT_OBEY = False
 
 """DB settings"""
 DB_CONNECTION = "mongodb+srv://padopiadbuser:WZHZbvqLq5kf4gDyHkzG@padopiacluster.p0hcr.mongodb.net/<dbname>?retryWrites=true&w=majority"
@@ -33,10 +22,23 @@ ITEM_PIPELINES = {
     'webscraper.pipelines.PropertyPipeline': 300,
 }
 
+# CONCURRENT_REQUESTS = 5
+# DOWNLOAD_DELAY = 2
+
+"""Middlewares for useragent, rotating proxies and selenium"""
+# DOWNLOADER_MIDDLEWARES = {
+#     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+#     'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+#     'scrapy_selenium.SeleniumMiddleware': 800,
+#     # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 560,
+#     # 'rotating_proxies.middlewares.BanDetectionMiddleware': 570,
+# }
+
+
 """Selenium settings"""
-SELENIUM_DRIVER_NAME = 'chrome'
-SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
-SELENIUM_DRIVER_ARGUMENTS = ['--headless']  # '--headless' if using chrome instead of firefox
+# SELENIUM_DRIVER_NAME = 'chrome'
+# SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
+# SELENIUM_DRIVER_ARGUMENTS = ['--headless']  # '--headless' if using chrome instead of firefox
 
 """Base file layout"""
 # ROTATING_PROXY_LIST_PATH = 'proxy.txt'

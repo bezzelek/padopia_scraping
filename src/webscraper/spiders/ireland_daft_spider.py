@@ -1,30 +1,40 @@
+import os
+
 import scrapy
 
 from logging import getLogger
 from datetime import datetime
+from shutil import which
 
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from scrapy_selenium import SeleniumRequest
-from apscheduler.schedulers.twisted import TwistedScheduler
 
 
 logger = getLogger()
 
 
-class IrelandSpider(scrapy.Spider):
+class IrelandDaftSpider(scrapy.Spider):
     logger.info('Launching Ireland spider...')
     name = 'ireland'
     start_urls = [
         'https://www.daft.ie/ireland/property-for-sale/?s%5Badvanced%5D=1&searchSource=sale&offset=00'
     ]
 
-    """JSON output just for testing"""
-    # custom_settings = {
-    #     'FEED_FORMAT': 'json',
-    #     'FEED_URI': 'data.json'
-    # }
+    custom_settings = {
+        'CONCURRENT_REQUESTS': 5,
+        'DOWNLOADER_MIDDLEWARES': {
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+            'scrapy_selenium.SeleniumMiddleware': 800,
+        },
+        'SELENIUM_DRIVER_NAME': 'chrome',
+        'SELENIUM_DRIVER_EXECUTABLE_PATH': which('chromedriver'),
+        'SELENIUM_DRIVER_ARGUMENTS': ['--headless'],
+        # 'FEED_FORMAT': 'json',
+        # 'FEED_URI': 'data.json',
+    }
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -48,8 +58,9 @@ class IrelandSpider(scrapy.Spider):
         logger.info('Scraping property page...')
         items = PropertyItem()
 
-        property_link_extract = response.xpath('/html/head/meta[29]/@content').extract()
-        property_link = ''.join(property_link_extract).strip()
+        property_source_website = 'https://www.daft.ie/'
+        property_website_country = 'Ireland'
+        property_link = response.url
         property_address_extract = response.css('.PropertyMainInformation__address::text').extract()
         property_address = ''.join(property_address_extract).strip()
         property_cost_extract = response.css('.PropertyInformationCommonStyles__costAmountCopy::text').extract()
@@ -94,8 +105,17 @@ class IrelandSpider(scrapy.Spider):
         property_agency_licence_extract = response.xpath('//aside/section/div[3]/span/text()').extract()
         property_agency_licence = ''.join(property_agency_licence_extract).strip()
         property_agency_link = response.xpath('/html/body/div[10]/div[2]/div[2]/aside/section/h4/a/@href').get()
+
+        property_address_lower = property_address.lower()
+        punctuation = "!@#$%^&*()_-+<>?:.,;"
+        for symbol in property_address_lower:
+            if symbol in punctuation:
+                property_address_lower = property_address_lower.replace(symbol, "")
+        property_slug = property_address_lower.replace(" ", "-")
         date_time = datetime.utcnow()
 
+        items['property_source_website'] = property_source_website
+        items['property_website_country'] = property_website_country
         items['property_link'] = property_link
         items['property_address'] = property_address
         items['property_cost'] = property_cost
@@ -117,6 +137,7 @@ class IrelandSpider(scrapy.Spider):
         items['property_agent_photo'] = property_agent_photo
         items['property_agency_licence'] = property_agency_licence
         items['property_agency_link'] = property_agency_link
+        items['property_slug'] = property_slug
         items['date_time'] = date_time
 
         """Go to agency page"""
@@ -131,10 +152,12 @@ class IrelandSpider(scrapy.Spider):
         logger.info('Scraping agency page...')
         items = AgencyItem()
 
+        agency_source_website = 'https://www.daft.ie/'
+        agency_website_country = 'Ireland'
         agency_name_extract = response.xpath('//*[@id="gc_content"]/h1/text()').extract()
         agency_name = ''.join(agency_name_extract).strip()
         agency_logo = response.xpath('/html/body/div[6]/img/@src').get()
-        agency_link = response.xpath('/html/head/link[1]/@href').get()
+        agency_link = response.url
 
         agency_overview_extract = response.xpath(
             '//*[@id="gc_links"]/p/text() | //*[@id="gc_links"]/p/a/text()').extract()
@@ -162,8 +185,17 @@ class IrelandSpider(scrapy.Spider):
             agency_agents_details['name'].append(name)
             agency_agents_details['phone'].append(phone)
             agency_agents_details['add_info'].append(add_info)
+
+        agency_name_lower = agency_name.lower()
+        punctuation = "!@#$%^&*()_-+<>?:.,;"
+        for symbol in agency_name_lower:
+            if symbol in punctuation:
+                agency_name_lower = agency_name_lower.replace(symbol, "")
+        agency_slug = agency_name_lower.replace(" ", "-")
         date_time = datetime.utcnow()
 
+        items['agency_source_website'] = agency_source_website
+        items['agency_website_country'] = agency_website_country
         items['agency_name'] = agency_name
         items['agency_logo'] = agency_logo
         items['agency_link'] = agency_link
@@ -171,19 +203,25 @@ class IrelandSpider(scrapy.Spider):
         items['agency_licence_number'] = agency_licence_number
         items['agency_details'] = agency_details
         items['agency_agents_details'] = agency_agents_details
+        items['agency_slug'] = agency_slug
         items['date_time'] = date_time
 
         logger.info('Yielding new agency item...')
         yield items
 
 
-"""Launch script"""
+class IrelandDaftScraper:
+    def __init__(self):
+        settings_file_path = 'webscraper.settings'
+        os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
+        self.process = CrawlerProcess(get_project_settings())
+        self.spider = IrelandDaftSpider
+
+    def run_spiders(self):
+        self.process.crawl(self.spider)
+        self.process.start()
+
+
 if __name__ == "__main__":
-    process = CrawlerProcess(get_project_settings())
-    """Scheduler to run task periodically"""
-    # scheduler = TwistedScheduler()
-    # scheduler.add_job(process.crawl, 'interval', args=[IrelandSpider], seconds=60*60*24)
-    # scheduler.start()
-    # process.start(False)
-    process.crawl(IrelandSpider)
-    process.start()
+    scraper = IrelandDaftScraper()
+    scraper.run_spiders()
