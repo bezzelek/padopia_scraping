@@ -1,6 +1,6 @@
 restart: down up
 
-init: scraper
+init: spain_property ireland
 
 ### Compose shortcuts
 up:
@@ -20,7 +20,10 @@ logs:
 
 ### Project shortcuts
 
-scraper:
-	docker-compose run --rm scraper_launch python src/webscraper/spiders/runner.py
+spain_property:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain_idealista_property_spider.py
+
+ireland:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/ireland_daft_spider.py
 
 ### Linters
