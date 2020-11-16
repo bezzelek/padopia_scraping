@@ -7,3 +7,11 @@ services:
     image: padopia-service:dev
     volumes:
     - .:/app
+    depends_on:
+    - rabbit
+
+  rabbit:
+    image: rabbitmq:3.8.3-management-alpine
+    ports:
+      - '5672:5672'
+      - '15672:15672'

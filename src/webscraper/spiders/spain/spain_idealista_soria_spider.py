@@ -16,11 +16,11 @@ from webscraper.proxies import get_proxies
 logger = getLogger()
 
 
-class SpainIdealistaPropertySpider(scrapy.Spider):
-    logger.info('Launching Spain spider...')
-    name = 'spain'
+class SpainIdealistaSoriaSpider(scrapy.Spider):
+    logger.info('Launching Soria spider...')
+    name = 'IdealistaPropertySoria'
     start_urls = [
-        'https://www.idealista.com/en/'
+        'https://www.idealista.com/en/venta-viviendas/soria-provincia/'
     ]
 
     custom_settings = {
@@ -65,21 +65,7 @@ class SpainIdealistaPropertySpider(scrapy.Spider):
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
         home_page = 'https://www.idealista.com'
-        region_urls = response.xpath("//div[@class='locations-list clearfix']/ul/li/a/@href").extract()
 
-        """Getting links of all regions"""
-        region_links_search = []
-        for region_url in region_urls:
-            region_link_url = home_page + region_url
-            region_link = region_link_url[:-10]
-            region_links_search.append(region_link)
-
-        for link in region_links_search:
-            yield scrapy.Request(url=link, callback=self.parse_search_page, priority=1)
-
-    def parse_search_page(self, response, **kwargs):
-        """Getting links of property pages in particular search page"""
-        home_page = 'https://www.idealista.com'
         property_page_part = response.xpath('//*[@id="main-content"]/section/article/div/a/@href').extract()
         property_pages_buffer = []
         for link in property_page_part:
@@ -96,7 +82,7 @@ class SpainIdealistaPropertySpider(scrapy.Spider):
         if next_url_part is not None:
             next_url = home_page + next_url_part
             logger.info('Following pagination and going to nex page...')
-            yield response.follow(next_url, callback=self.parse_search_page, priority=10)
+            yield response.follow(next_url, callback=self.parse, priority=10)
 
     def parse_property_content(self, response, **kwargs):
         logger.info('Scraping property page...')
@@ -198,12 +184,12 @@ class SpainIdealistaPropertySpider(scrapy.Spider):
         yield items
 
 
-class SpainIdealistaPropertyScraper:
+class SpainIdealistaSoriaScraper:
     def __init__(self):
         settings_file_path = 'webscraper.settings'
         os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
         self.process = CrawlerProcess(get_project_settings())
-        self.spider = SpainIdealistaPropertySpider
+        self.spider = SpainIdealistaSoriaSpider
 
     def run_spiders(self):
         self.process.crawl(self.spider)
@@ -211,5 +197,5 @@ class SpainIdealistaPropertyScraper:
 
 
 if __name__ == "__main__":
-    scraper = SpainIdealistaPropertyScraper()
+    scraper = SpainIdealistaSoriaScraper()
     scraper.run_spiders()
