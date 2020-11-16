@@ -23,7 +23,7 @@ class IrelandDaftSpider(scrapy.Spider):
     ]
 
     custom_settings = {
-        'CONCURRENT_REQUESTS': 5,
+        'CONCURRENT_REQUESTS': 2,
         'DOWNLOADER_MIDDLEWARES': {
             'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
             'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,

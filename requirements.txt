@@ -10,7 +10,7 @@ celery==4.4.6
 # Database
 pymongo==3.11.0
 
-# Required for propie def()
+# Required for proxies def()
 requests==2.25.0
 lxml==4.6.1
 itemadapter==0.2.0
