@@ -19,6 +19,8 @@ logs:
 	docker-compose logs -f
 
 ### Project shortcuts
+celery:
+	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
 
 spain_property:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain_idealista_property_spider.py
