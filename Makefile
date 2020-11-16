@@ -23,9 +23,9 @@ celery:
 	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
 
 spain_property:
-	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain_idealista_property_spider.py
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain/spain_idealista_property_spider.py
 
 ireland:
-	docker-compose run --rm scraper_launch python src/webscraper/spiders/ireland_daft_spider.py
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/ireland/ireland_daft_spider.py
 
 ### Linters
