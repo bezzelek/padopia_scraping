@@ -18,14 +18,28 @@ sh:
 logs:
 	docker-compose logs -f
 
+check:
+	docker-compose ps && docker ps
+# docker attach <container_id>
+
 ### Project shortcuts
 celery:
-	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
+	docker-compose run -d --rm scraper_launch celery -E -A root worker --beat --loglevel=info
 
 spain_property:
-	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain/spain_idealista_property_spider.py
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/spain/spain_idealista_property_spider.py
 
 ireland:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/ireland/ireland_daft_spider.py
+
+### Project shortcuts for debugging
+celery_test:
+	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
+
+spain_property_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain/spain_idealista_property_spider.py
+
+ireland_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/ireland/ireland_daft_spider.py
 
 ### Linters
