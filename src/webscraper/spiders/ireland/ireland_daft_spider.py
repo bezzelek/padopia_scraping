@@ -17,7 +17,7 @@ logger = getLogger()
 
 class IrelandDaftSpider(scrapy.Spider):
     logger.info('Launching Ireland spider...')
-    name = 'ireland'
+    name = 'Daft'
     start_urls = [
         'https://www.daft.ie/ireland/property-for-sale/?s%5Badvanced%5D=1&searchSource=sale&offset=00'
     ]
