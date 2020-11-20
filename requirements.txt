@@ -1,14 +1,17 @@
 # Scrapy
-scrapy==2.4.0
+scrapy==2.4.1
 scrapy-user-agents==0.1.1
 scrapy-selenium==0.0.7
 scrapy-rotating-proxies==0.6.2
+
+# Translate
+google-cloud-translate==3.0.1
 
 # Schudeler
 celery==4.4.6
 
 # Database
-pymongo==3.11.0
+pymongo==3.11.1
 
 # Required for proxies def()
 requests==2.25.0
