@@ -32,6 +32,9 @@ spain_property:
 ireland:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/ireland/ireland_daft_spider.py
 
+bulgaria:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/bulgaria/bulgaria_imot_spider.py
+
 ### Project shortcuts for debugging
 celery_test:
 	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
@@ -41,5 +44,8 @@ spain_property_test:
 
 ireland_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/ireland/ireland_daft_spider.py
+
+bulgaria_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/bulgaria/bulgaria_imot_spider.py
 
 ### Linters
