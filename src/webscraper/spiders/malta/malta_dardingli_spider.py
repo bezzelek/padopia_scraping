@@ -133,11 +133,13 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization):
         property_type_pretty = self.get_text(property_type_extract, 'title="', ',')
         property_type_no_commas = self.get_no_punctuation(property_type_pretty)
         property_type_no_spaces = self.get_no_spaces(property_type_no_commas)
-        property_type = self.check_if_exists(property_type_no_spaces)
-        property_slug_combine = property_address + ', ' + property_type
+        property_type = self.normalize_property_type(property_type_no_spaces)
+        if property_address is not None and property_type is not None:
+            property_slug_combine = property_address + ', ' + property_type
+        else:
+            property_slug_combine = property_website_country + ', ' + property_type
         property_slug = self.get_slug(property_slug_combine)
         date_time = datetime.utcnow()
-
         property_agency_get = self.get_text(property_script, 'Visit Agent’s Page', '</a>')
         property_agency_name_get = self.get_text(property_agency_get, '/">', '<')
         property_agency_name_pretty = self.get_no_tags(property_agency_name_get)
