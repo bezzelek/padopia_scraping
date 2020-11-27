@@ -1,8 +1,5 @@
 class Normalization:
 
-    def __init__(self):
-        pass
-
     def normalize_currency(self, value):
         result = (
             '€' if value == 'EUR'

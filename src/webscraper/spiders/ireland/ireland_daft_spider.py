@@ -10,12 +10,14 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from scrapy_selenium import SeleniumRequest
+from src.webscraper.normalization.data_normalization import Normalization
+from src.webscraper.normalization.process_photo import UploadPhoto
 
 
 logger = getLogger()
 
 
-class IrelandDaftSpider(scrapy.Spider):
+class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
     logger.info('Launching Ireland spider...')
     name = 'Daft'
     start_urls = [
@@ -32,9 +34,11 @@ class IrelandDaftSpider(scrapy.Spider):
         'SELENIUM_DRIVER_NAME': 'chrome',
         'SELENIUM_DRIVER_EXECUTABLE_PATH': which('chromedriver'),
         'SELENIUM_DRIVER_ARGUMENTS': ['--headless'],
-        # 'FEED_FORMAT': 'json',
-        # 'FEED_URI': 'data.json',
     }
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.s_client = self.start_client_storage()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -89,8 +93,18 @@ class IrelandDaftSpider(scrapy.Spider):
         property_features_extract = response.xpath("//ul/li/span/text()").extract()
         property_features = ''.join(property_features_extract).strip()
         property_photo_extract = response.xpath('//*[@id="pbxl_carousel"]/ul/li[1]/img/@src').extract()
-        property_photo = ''.join(property_photo_extract).strip()
-        property_photos = response.xpath('//*[@id="pbxl_carousel"]/ul/li/img/@src').extract()
+        property_photo_strit = ''.join(property_photo_extract).strip()
+        property_photo_check = self.check_if_exists(property_photo_strit)
+        if property_photo_check is not None:
+            property_photo = self.store_images(property_photo_check)
+        else:
+            property_photo = None
+        property_photos_extract = response.xpath('//*[@id="pbxl_carousel"]/ul/li/img/@src').extract()
+        property_photos_check = self.check_if_exists(property_photos_extract)
+        if property_photos_check is not None:
+            property_photos = self.store_images(property_photos_check)
+        else:
+            property_photos = None
         property_renewed_extract = response.xpath(
             '//div[1]/div[@class="PropertyStatistics__iconData"][1]/text()').extract()
         property_renewed = ''.join(property_renewed_extract).strip()
@@ -101,7 +115,12 @@ class IrelandDaftSpider(scrapy.Spider):
         property_agent_extract = response.xpath("//h4[@class='ContactForm__negotiatorName']/text()").extract()
         property_agent = ''.join(property_agent_extract).strip()
         property_agent_photo_extract = response.xpath("//aside/div[1]/div/div[1]/div/img/@src").extract()
-        property_agent_photo = ''.join(property_agent_photo_extract).strip()
+        property_agent_photo_strip = ''.join(property_agent_photo_extract).strip()
+        property_agent_photo_check = self.check_if_exists(property_agent_photo_strip)
+        if property_agent_photo_check is not None:
+            property_agent_photo = self.store_images(property_agent_photo_check)
+        else:
+            property_agent_photo = None
         property_agency_licence_extract = response.xpath('//aside/section/div[3]/span/text()').extract()
         property_agency_licence = ''.join(property_agency_licence_extract).strip()
         property_agency_link = response.xpath('/html/body/div[10]/div[2]/div[2]/aside/section/h4/a/@href').get()
@@ -156,7 +175,12 @@ class IrelandDaftSpider(scrapy.Spider):
         agency_website_country = 'Ireland'
         agency_name_extract = response.xpath('//*[@id="gc_content"]/h1/text()').extract()
         agency_name = ''.join(agency_name_extract).strip()
-        agency_logo = response.xpath('/html/body/div[6]/img/@src').get()
+        agency_logo_extract = response.xpath('/html/body/div[6]/img/@src').get()
+        agency_logo_check = self.check_if_exists(agency_logo_extract)
+        if agency_logo_check is not None:
+            agency_logo = self.store_images(agency_logo_check)
+        else:
+            agency_logo = None
         agency_link = response.url
 
         agency_overview_extract = response.xpath(
