@@ -10,11 +10,13 @@ from scrapy.utils.project import get_project_settings
 
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
+from src.webscraper.normalization.process_photo import UploadPhoto
+
 
 logger = getLogger()
 
 
-class MaltaDardingliSpider(scrapy.Spider, Normalization):
+class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto):
     logger.info('Launching Malta Dardingli spider...')
     name = 'Dardingli'
     start_urls = [
@@ -28,6 +30,10 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization):
             'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
         },
     }
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.s_client = self.start_client_storage()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -53,10 +59,12 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization):
             for text in response.xpath('//section[@id="content"]')
         ])
         property_photos_extract = self.get_list(property_script, 'data-background="', '"')[1:]
-        property_photos = self.check_if_exists(property_photos_extract)
-        if property_photos is not None:
+        property_photos_check = self.check_if_exists(property_photos_extract)
+        if property_photos_check is not None:
+            property_photos = self.store_images(property_photos_check)
             property_photo = property_photos[0]
         else:
+            property_photos = None
             property_photo = None
         property_cost_extract = self.get_text(property_script, 'id="df_field_price">', '/span>')
         property_cost_pretty = self.get_text(property_cost_extract, '<span>', '<')
@@ -194,7 +202,11 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization):
         agency_name = self.check_if_exists(agency_name_pretty)
         agency_logo_extract = self.get_text(agency_script, 'alt="Agent Thumbnail"', '>')
         agency_logo_link = self.get_text(agency_logo_extract, 'srcset="', '"')
-        agency_logo = self.check_if_exists(agency_logo_link)
+        agency_logo_check = self.check_if_exists(agency_logo_link)
+        if agency_logo_check is not None:
+            agency_logo = self.store_images(agency_logo_check)
+        else:
+            agency_logo = None
         agency_overview_extract = self.get_text(agency_script, 'class="about">', '</li>')
         agency_overview = self.check_if_exists(agency_overview_extract)
         if agency_overview is not None:
