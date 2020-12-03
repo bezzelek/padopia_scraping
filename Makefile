@@ -38,6 +38,9 @@ bulgaria:
 malta:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/malta/malta_dardingli_spider.py
 
+spain_fotocasa:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/spain/spain_fotocasa_spider.py
+
 ### Project shortcuts for debugging
 celery_test:
 	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
@@ -53,4 +56,8 @@ bulgaria_test:
 
 malta_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/malta/malta_dardingli_spider.py
+
+spain_fotocasa_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain/spain_fotocasa_spider.py
+
 ### Linters
