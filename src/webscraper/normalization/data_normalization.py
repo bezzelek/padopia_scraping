@@ -31,15 +31,21 @@ class Normalization:
 
             else 'House' if value == 'КЪЩА'
                             or value == 'ВИЛА'
+                            or value == 'Rural property'
+                            or value == 'House or chalet'
             else 'Palace' if value == 'Palace/Castle/Manor'
             else 'Penthouse' if value == 'Penthouse'
             else 'Terraced House' if value == 'Terraced House'
             else 'Villa' if value == 'Villa'
             else 'Bungalow' if value == 'Bungalow'
             else 'Boathouse' if value == 'Boathouse'
+            else 'Semi-detached' if value == 'Single-family semi-detached'
+            else 'Country house' if value == 'Country house'
 
             else 'Parking Space' if value == 'Garage/Parking Space'
 
+            else 'Flat' if value == 'Flat'
+            else 'Attic' if value == 'Attic'
             else 'Apartment' if value == 'Apartment'
                                 or value == '1-СТАЕН'
                                 or value == '2-СТАЕН'
@@ -49,12 +55,21 @@ class Normalization:
                                 or value == 'МНОГОСТАЕН'
                                 or value == 'МЕЗОНЕТ'
                                 or value == 'АТЕЛИЕ, ТАВАН'
+                                or value == 'Intermediate floors'
+                                or value == 'Ground floor'
+                                or value == 'Planta baja'
+            else 'Penthouse' if value == 'Penthouse'
+            else 'Duplex apartment' if value == 'Duplex apartment'
+                                       or value == 'Duplex'
+            else 'Loft' if value == 'Loft'
+            else 'Studio' if value == 'Studio'
+                             or value == 'Study'
+            else 'Apartment' if value == 'Apartment'
             else 'Room' if value == 'Room'
             else 'Maisonette' if value == 'Maisonette'
             else 'Townhouse' if value == 'Townhouse'
             else 'Mixed units' if value == 'Block of apartments/mixed units'
             else 'COVID-19 Accommodation' if value == 'COVID-19 Accommodation'
-            else 'Studio' if value == 'Studio'
 
             else 'Office' if value == 'Office'
                              or value == 'ОФИС'
@@ -131,11 +146,17 @@ class Normalization:
         return result
 
     def get_letters(self, string):
-        result = ''.join([number for number in string if not number.isdigit()]).strip()
+        if string is not None:
+            result = ''.join([number for number in string if not number.isdigit()]).strip()
+        else:
+            result = None
         return result
 
     def get_digits(self, string):
-        result = ''.join([number for number in string if number.isdigit()])
+        if string is not None:
+            result = ''.join([number for number in string if number.isdigit()])
+        else:
+            result = None
         return result
 
     def get_no_spaces(self, value):
@@ -166,4 +187,15 @@ class Normalization:
             result = value
         else:
             result = None
+        return result
+
+    def get_if_element_in(self, elements_list, start_str, end_str, exist):
+        for element in elements_list:
+            if exist in element:
+                result = self.get_text(element, start_str, end_str)
+                return result
+
+    def get_shorter(self, long_string, limiter):
+        item = long_string.index(limiter)
+        result = long_string[:item + len(limiter)]
         return result

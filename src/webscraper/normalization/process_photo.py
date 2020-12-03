@@ -2,7 +2,12 @@ import os
 import asyncio
 import aiohttp
 
+from logging import getLogger
+
 from google.cloud import storage
+
+
+logger = getLogger()
 
 
 class UploadPhoto:
@@ -25,48 +30,39 @@ class UploadPhoto:
         tasks = []
         async with aiohttp.ClientSession() as session:
             for url in urls:
-                task = asyncio.create_task(self.transfer_to_db(url, session))
+                task = asyncio.create_task(self.get_data(url, session))
                 tasks.append(task)
             await asyncio.gather(*tasks)
         result = [item._result for item in tasks]
         return result
 
-    async def transfer_to_db(self, url, session):
+    async def get_data(self, url, session):
         async with session.get(url) as response:
+            logger.info('Downloading photo...')
+
             file = await response.read()
             file_name = os.path.basename(url)
-            bucket_name = 'padopia-media-files'
-            blob_name = 'photos/'
-            bucket = self.s_client.get_bucket(bucket_name)
-            blob = bucket.blob(blob_name + file_name)
-            check = storage.Blob(bucket=bucket, name=blob_name + file_name).exists(client=self.s_client)
-            if check is True:
-                result = blob.public_url
-            else:
-                blob.upload_from_string(file, content_type='image')
-                blob.make_public()
-                result = blob.public_url
+
+            tasks = []
+            task = asyncio.create_task(self.transfer_to_db(file, file_name))
+            tasks.append(task)
+            await asyncio.gather(*tasks)
+            for item in tasks:
+                result = item._result
             return result
 
-    # def store_images(self, photos_list):
-    #     stored_links = []
-    #     for element in photos_list:
-    #         link = self.data_transferring(element)
-    #         stored_links.append(link)
-    #     return stored_links
-    #
-    # def data_transferring(self, element):
-    #     bucket_name = 'padopia-media-files'
-    #     blob_name = 'photos/'
-    #     file = urllib.request.urlopen(element)
-    #     file_name = os.path.basename(element)
-    #     bucket = self.s_client.get_bucket(bucket_name)
-    #     blob = bucket.blob(blob_name + file_name)
-    #     check = storage.Blob(bucket=bucket, name=blob_name + file_name).exists(client=self.s_client)
-    #     if check is True:
-    #         url = blob.public_url
-    #     else:
-    #         blob.upload_from_string(file.read(), content_type='image')
-    #         blob.make_public()
-    #         url = blob.public_url
-    #     return url
+    async def transfer_to_db(self, file, file_name):
+        logger.info('Storing photo...')
+
+        bucket_name = 'padopia-media-files'
+        blob_name = 'photos/'
+        bucket = self.s_client.get_bucket(bucket_name)
+        blob = bucket.blob(blob_name + file_name)
+        check = storage.Blob(bucket=bucket, name=blob_name + file_name).exists(client=self.s_client)
+        if check is True:
+            result = blob.public_url
+        else:
+            blob.upload_from_string(file, content_type='image')
+            blob.make_public()
+            result = blob.public_url
+        return result

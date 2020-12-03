@@ -4,6 +4,7 @@ from celery.task import periodic_task
 from webscraper.spiders.bulgaria.bulgaria_imot_spider import BulgariaImotScraper
 from webscraper.spiders.ireland.ireland_daft_spider import IrelandDaftScraper
 from webscraper.spiders.malta.malta_dardingli_spider import MaltaDardingliScraper
+from webscraper.spiders.spain.spain_fotocasa_spider import SpainFotocasaScraper
 from webscraper.spiders.spain.spain_idealista_alava_spider import SpainIdealistaAlavaScraper
 from webscraper.spiders.spain.spain_idealista_albacete_spider import SpainIdealistaAlbaceteScraper
 from webscraper.spiders.spain.spain_idealista_alicante_spider import SpainIdealistaAlicanteScraper
@@ -61,19 +62,25 @@ from webscraper.spiders.spain.spain_idealista_zamora_spider import SpainIdealist
 from webscraper.spiders.spain.spain_idealista_zaragoza_spider import SpainIdealistaZaragozaScraper
 
 
-@periodic_task(run_every=crontab(hour=0, minute=5), time_limit=60 * 60 * 23)
+@periodic_task(run_every=crontab(hour=0, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
 def run_ireland_daft():
     scraper = IrelandDaftScraper()
     scraper.run_spiders()
 
 
-@periodic_task(run_every=crontab(hour=6, minute=5), time_limit=60 * 60 * 23)
+@periodic_task(run_every=crontab(hour=6, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
 def run_malta_dardingli():
     scraper = MaltaDardingliScraper()
     scraper.run_spiders()
 
 
-# @periodic_task(run_every=crontab(hour=12, minute=5), time_limit=60 * 60 * 23)
+@periodic_task(run_every=crontab(hour=18, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
+def run_spain_fotocasa():
+    scraper = SpainFotocasaScraper()
+    scraper.run_spiders()
+
+
+# @periodic_task(run_every=crontab(hour=12, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
 # def run_bulgaria_imot():
 #     scraper = BulgariaImotScraper()
 #     scraper.run_spiders()

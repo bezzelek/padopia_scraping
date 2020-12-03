@@ -178,7 +178,9 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
         agency_logo_extract = response.xpath('/html/body/div[6]/img/@src').get()
         agency_logo_check = self.check_if_exists(agency_logo_extract)
         if agency_logo_check is not None:
-            agency_logo = self.store_images(agency_logo_check)
+            agency_logo_list = [agency_logo_check]
+            agency_logo_store = self.store_images(agency_logo_list)
+            agency_logo = agency_logo_store[0]
         else:
             agency_logo = None
         agency_link = response.url

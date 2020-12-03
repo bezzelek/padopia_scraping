@@ -95,11 +95,6 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto):
         )
         property_description_pretty = self.get_text(property_description_extract, '-->', '<!-- ')
         property_description = self.check_if_exists(property_description_pretty)
-        # property_reference_num_extract = self.get_text(
-        #     property_script, 'title="Internal Reference Number">', 'item out value tpl end -->'
-        # )
-        # property_reference_num_pretty = self.get_text(property_reference_num_extract, '-->', '<!-- ')
-        # property_reference_num = self.check_if_exists(property_reference_num_pretty)
         property_advertise_type_extract = self.get_text(
             property_script, 'title="Property for">', 'item out value tpl end -->'
         )
@@ -204,7 +199,9 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto):
         agency_logo_link = self.get_text(agency_logo_extract, 'srcset="', '"')
         agency_logo_check = self.check_if_exists(agency_logo_link)
         if agency_logo_check is not None:
-            agency_logo = self.store_images(agency_logo_check)
+            agency_logo_list = [agency_logo_check]
+            agency_logo_store = self.store_images(agency_logo_list)
+            agency_logo = agency_logo_store[0]
         else:
             agency_logo = None
         agency_overview_extract = self.get_text(agency_script, 'class="about">', '</li>')
