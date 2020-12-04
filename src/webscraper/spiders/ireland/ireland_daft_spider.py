@@ -100,16 +100,20 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
             property_features = None
 
         """Photos extract"""
-        property_photos_extract = final_data['media']['images']
-        property_photos_get = []
-        for element in property_photos_extract:
-            link = next(iter(element.values()))
-            if 'http' in link:
-                property_photos_get.append(link)
-            else:
-                element.pop('caption', None)
+        try:
+            property_photos_extract = final_data['media']['images']
+        except:
+            property_photos_extract = None
+        if property_photos_extract is not None:
+            property_photos_get = []
+            for element in property_photos_extract:
                 link = next(iter(element.values()))
-                property_photos_get.append(link)
+                if 'http' in link:
+                    property_photos_get.append(link)
+                else:
+                    element.pop('caption', None)
+                    link = next(iter(element.values()))
+                    property_photos_get.append(link)
         """Photos save"""
         property_photo_check = self.check_if_exists(property_photos_get)
         if property_photo_check is not None:
@@ -187,16 +191,17 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
 
         """Agency"""
         try:
-            agency_check = final_data['seller']
+            agency_check = final_data['seller']['branch']
         except:
             agency_check = None
         if agency_check is not None:
             a_items = AgencyItem()
+            agency_info = final_data['seller']
             agency_source_website = 'https://www.daft.ie/'
             agency_website_country = 'Ireland'
-            agency_name = agency_check['branch']
+            agency_name = agency_info['branch']
             try:
-                agency_logo_check = self.check_if_exists(agency_check['squareLogo'])
+                agency_logo_check = self.check_if_exists(agency_info['squareLogo'])
             except:
                 agency_logo_check = None
             if agency_logo_check is not None:
@@ -207,7 +212,7 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
                 agency_logo = None
 
             try:
-                agency_phone = self.check_if_exists(agency_check['phone'])
+                agency_phone = self.check_if_exists(agency_info['phone'])
             except:
                 agency_phone = None
             agency_slug = self.get_slug(
