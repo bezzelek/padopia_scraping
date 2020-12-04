@@ -113,14 +113,11 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
         """Photos save"""
         property_photo_check = self.check_if_exists(property_photos_get)
         if property_photo_check is not None:
-            property_photo = self.store_images(property_photo_check)
-        else:
-            property_photo = None
-        property_photos_check = self.check_if_exists(property_photos_extract)
-        if property_photos_check is not None:
-            property_photos = self.store_images(property_photos_check)
+            property_photos = self.store_images(property_photo_check)
+            property_photo = property_photos[0]
         else:
             property_photos = None
+            property_photo = None
 
         property_renewed_extract = final_data['lastUpdateDate']
         property_renewed = self.check_if_exists(property_renewed_extract)
