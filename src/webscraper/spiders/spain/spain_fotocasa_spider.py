@@ -26,6 +26,7 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
 
     custom_settings = {
         'CONCURRENT_REQUESTS': 2,
+        'DOWNLOAD_DELAY': 2,
         'DOWNLOADER_MIDDLEWARES': {
             'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
             'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
@@ -34,7 +35,7 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.s_client = self.start_client_storage()
+        self.storage_client = self.start_client_storage()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')

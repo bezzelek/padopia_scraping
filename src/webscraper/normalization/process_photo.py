@@ -13,7 +13,7 @@ logger = getLogger()
 class UploadPhoto:
 
     def __init__(self):
-        self.s_client = self.s_client
+        self.storage_client = self.storage_client
 
     def start_client_storage(self):
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'src/resonant-forge-294511-25f7c1fc6d0f.json'
@@ -56,9 +56,9 @@ class UploadPhoto:
 
         bucket_name = 'padopia-media-files'
         blob_name = 'photos/'
-        bucket = self.s_client.get_bucket(bucket_name)
+        bucket = self.storage_client.get_bucket(bucket_name)
         blob = bucket.blob(blob_name + file_name)
-        check = storage.Blob(bucket=bucket, name=blob_name + file_name).exists(client=self.s_client)
+        check = storage.Blob(bucket=bucket, name=blob_name + file_name).exists(client=self.storage_client)
         if check is True:
             result = blob.public_url
         else:

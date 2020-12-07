@@ -74,16 +74,16 @@ def run_malta_dardingli():
     scraper.run_spiders()
 
 
+@periodic_task(run_every=crontab(hour=12, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
+def run_bulgaria_imot():
+    scraper = BulgariaImotScraper()
+    scraper.run_spiders()
+
+
 @periodic_task(run_every=crontab(hour=18, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
 def run_spain_fotocasa():
     scraper = SpainFotocasaScraper()
     scraper.run_spiders()
-
-
-# @periodic_task(run_every=crontab(hour=12, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
-# def run_bulgaria_imot():
-#     scraper = BulgariaImotScraper()
-#     scraper.run_spiders()
 
 
 @periodic_task(run_every=crontab(hour=0, minute=0, day_of_week='sat,mon,wed'), time_limit=60 * 60 * 23 * 2)
