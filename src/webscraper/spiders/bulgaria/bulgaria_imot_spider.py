@@ -13,15 +13,13 @@ from scrapy.utils.project import get_project_settings
 
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
-from src.webscraper.normalization.translate_text import Translate
 from src.webscraper.normalization.process_photo import UploadPhoto
-
+from src.webscraper.normalization.geolocate import Geolocation
 
 logger = getLogger()
 
 
-class BulgariaImotSpider(scrapy.Spider, Normalization, Translate, UploadPhoto):
-
+class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation):
     logger.info('Launching Bulgaria spider...')
     name = 'Imot'
     start_urls = [
@@ -38,8 +36,8 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, Translate, UploadPhoto):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.t_client = self.start_client_translate()
-        self.s_client = self.start_client_storage()
+        self.storage_client = self.start_client_storage()
+        self.geolocation_client = self.start_geolocation_client()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -104,9 +102,11 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, Translate, UploadPhoto):
         property_address_original = self.get_text(property_document_extract, "Местоположение: <b>", "</b>")
         property_address_check = self.check_if_exists(property_address_original)
         if property_address_check is not None:
-            property_address = self.translate_text(property_address_original, 'bg')
+            property_address = self.get_address(property_address_original)
+            property_coordinates = self.get_coordinates(property_address_original)
         else:
             property_address = None
+            property_coordinates = None
 
         """Property cost"""
         property_cost = self.get_text(property_document_extract, '<strong style="color: #900">', "</strong>")
@@ -120,16 +120,16 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, Translate, UploadPhoto):
         property_square = self.check_if_exists(property_square_integer)
 
         """Property description"""
+        property_source_language = 'Bulgaria'
         property_description_extract = self.get_text(property_document_extract, 'id="description_div">', "</div>")
         property_description_check = self.check_if_exists(property_description_extract)
         if property_description_check is not None:
-            property_description_original = (
+            property_description_source = (
                 property_description_extract.replace('<br>', '\n') if '<br>' in property_description_extract
                 else property_description_extract
             )
-            property_description = self.translate_text(property_description_original, 'bg')
         else:
-            property_description = None
+            property_description_source = None
 
         """Property renewed"""
         property_renewed_extract = self.get_text(property_document_extract, 'margin:11px 0 3px 0">', "</div>")
@@ -161,11 +161,7 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, Translate, UploadPhoto):
 
         """Property agent"""
         property_agent_original = self.get_text(property_document_extract, '<b>Брокер: ', "</b>")
-        property_agent_original_check = self.check_if_exists(property_agent_original)
-        if property_agent_original_check is not None:
-            property_agent = self.translate_text(property_agent_original, 'bg')
-        else:
-            property_agent = None
+        property_agent = self.check_if_exists(property_agent_original)
         property_agent_photo_extract = ''.join(
             element.split('"')[0]
             for element in property_document_extract.split('<img src="..')[1:]
@@ -178,11 +174,7 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, Translate, UploadPhoto):
         else:
             property_agent_photo = None
         property_agency_original = self.get_text(property_document_extract, '<b>Агенция: ', "<br></b>")
-        property_agency_original_check = self.check_if_exists(property_agency_original)
-        if property_agency_original_check is not None:
-            property_agency = self.translate_text(property_agency_original, 'bg')
-        else:
-            property_agency = None
+        property_agency = self.check_if_exists(property_agency_original)
 
         """Property slug and our update time"""
         property_slug = self.get_slug(property_address)
@@ -192,13 +184,15 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, Translate, UploadPhoto):
         p_items['property_website_country'] = property_website_country
         p_items['property_link'] = property_link
         p_items['property_address'] = property_address
+        p_items['property_coordinates'] = property_coordinates
         p_items['property_cost'] = property_cost
         p_items['property_cost_integer'] = property_cost_integer
         p_items['property_cost_currency'] = property_cost_currency
         p_items['property_square'] = property_square
         p_items['property_type'] = property_type
         p_items['property_advertise_type'] = property_advertise_type
-        p_items['property_description'] = property_description
+        p_items['property_source_language'] = property_source_language
+        p_items['property_description_source'] = property_description_source
         p_items['property_photo'] = property_photo
         p_items['property_photos'] = property_photos
         p_items['property_renewed'] = property_renewed
