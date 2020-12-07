@@ -34,7 +34,7 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.s_client = self.start_client_storage()
+        self.storage_client = self.start_client_storage()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
