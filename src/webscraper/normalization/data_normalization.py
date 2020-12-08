@@ -188,12 +188,15 @@ class Normalization:
         return result
 
     def check_if_exists(self, value):
-        value_len = len(value)
-        if value_len > 0:
-            result = value
+        if value is not None:
+            value_len = len(value)
+            if value_len > 0:
+                result = value
+            else:
+                result = None
+            return result
         else:
-            result = None
-        return result
+            return None
 
     def get_if_element_in(self, elements_list, start_str, end_str, exist):
         for element in elements_list:
