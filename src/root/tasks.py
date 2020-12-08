@@ -60,6 +60,7 @@ from webscraper.spiders.spain.spain_idealista_valladolid_spider import SpainIdea
 from webscraper.spiders.spain.spain_idealista_vizcaya_spider import SpainIdealistaBiscayScraper
 from webscraper.spiders.spain.spain_idealista_zamora_spider import SpainIdealistaZamoraScraper
 from webscraper.spiders.spain.spain_idealista_zaragoza_spider import SpainIdealistaZaragozaScraper
+from webscraper.spiders.spain_idealista_property_spider import SpainIdealistaPropertyScraper
 
 
 @periodic_task(run_every=crontab(hour=0, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
@@ -85,6 +86,11 @@ def run_spain_fotocasa():
     scraper = SpainFotocasaScraper()
     scraper.run_spiders()
 
+
+@periodic_task(run_every=crontab(hour=19, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
+def run_spain_idealista():
+    scraper = SpainIdealistaPropertyScraper()
+    scraper.run_spiders()
 
 @periodic_task(run_every=crontab(hour=0, minute=0, day_of_week='sat,mon,wed'), time_limit=60 * 60 * 23 * 2)
 def run_spain_idealista_alava():

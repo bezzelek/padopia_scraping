@@ -11,7 +11,7 @@ from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
 from src.webscraper.normalization.process_photo import UploadPhoto
-from webscraper.proxies import get_proxies
+# from webscraper.proxies import get_proxies
 
 
 logger = getLogger()
@@ -28,17 +28,17 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
     custom_settings = {
         'CONCURRENT_REQUESTS': 5,
 
-        'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 403, 404, 408, 456],
-        'ROTATING_PROXY_PAGE_RETRY_TIMES': 10000,
-        'ROTATING_PROXY_LOGSTATS_INTERVAL': 15,
-        'ROTATING_PROXY_BACKOFF_BASE': 300,
-        'ROTATING_PROXY_BACKOFF_CAP': 900,
-        'ROTATING_PROXY_LIST': get_proxies(),
+        # 'RETRY_HTTP_CODES': [500, 502, 503, 504, 400, 403, 404, 408, 456],
+        # 'ROTATING_PROXY_PAGE_RETRY_TIMES': 10000,
+        # 'ROTATING_PROXY_LOGSTATS_INTERVAL': 15,
+        # 'ROTATING_PROXY_BACKOFF_BASE': 300,
+        # 'ROTATING_PROXY_BACKOFF_CAP': 900,
+        # 'ROTATING_PROXY_LIST': get_proxies(),
         'DOWNLOADER_MIDDLEWARES': {
             'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
             'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
-            'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
-            'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+            # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+            # 'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
         },
     }
 
@@ -136,8 +136,11 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
         if property_photos_extract_check is not None:
             property_photos_list = []
             for element in property_photos_extract:
-                item = self.get_shorter(element, 'jpg')
-                property_photos_list.append(item)
+                try:
+                    item = self.get_shorter(element, 'jpg')
+                    property_photos_list.append(item)
+                except:
+                    pass
             property_photos = self.store_images(property_photos_list)
             property_photo = property_photos[0]
         else:
@@ -268,8 +271,10 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
             agency_website = agency_website_check[0]
         else:
             agency_website = None
-
-        agency_slug = self.get_slug(agency_name)
+        try:
+            agency_slug = self.get_slug(agency_name)
+        except:
+            agency_slug = agency_name
         date_time = datetime.utcnow()
 
         items['agency_source_website'] = agency_source_website
