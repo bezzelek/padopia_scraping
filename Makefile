@@ -41,6 +41,9 @@ malta:
 spain_fotocasa:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/spain/spain_fotocasa_spider.py
 
+spain_idealista:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/spain_idealista_property_spider.py
+
 ### Project shortcuts for debugging
 celery_test:
 	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
@@ -59,5 +62,8 @@ malta_test:
 
 spain_fotocasa_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain/spain_fotocasa_spider.py
+
+spain_idealista_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain_idealista_property_spider.py
 
 ### Linters

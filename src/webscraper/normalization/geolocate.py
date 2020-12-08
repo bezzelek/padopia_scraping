@@ -12,13 +12,19 @@ class Geolocation:
 
     def get_address(self, property_address):
         location = self.geolocation_client.geocode(property_address, language='en')
-        result = location.address
+        if location is not None:
+            result = location.address
+        else:
+            result = property_address
         return result
 
     def get_coordinates(self, property_address):
         location = self.geolocation_client.geocode(property_address)
-        result = {
-            'latitude': location.latitude,
-            'longitude': location.longitude,
-        }
+        if location is not None:
+            result = {
+                'latitude': location.latitude,
+                'longitude': location.longitude,
+            }
+        else:
+            result = None
         return result

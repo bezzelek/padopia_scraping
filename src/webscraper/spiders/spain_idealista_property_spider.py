@@ -24,8 +24,8 @@ class SpainIdealistaPropertySpider(scrapy.Spider):
     ]
 
     custom_settings = {
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
-        'DOWNLOAD_DELAY': 3,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 2,
+        # 'DOWNLOAD_DELAY': 1,
         # 'DOWNLOAD_TIMEOUT': 10,
         'SELENIUM_DRIVER_NAME': 'chrome',
         'SELENIUM_DRIVER_EXECUTABLE_PATH': which('chromedriver'),
