@@ -56,3 +56,51 @@ class AgencyItem(scrapy.Item):
     agency_slug = scrapy.Field()
     date_time = scrapy.Field()
     pass
+
+
+# p_items['property_source_website'] = property_source_website
+# p_items['property_website_country'] = property_website_country
+# p_items['property_link'] = property_link
+# p_items['property_address'] = property_address
+# p_items['property_cost'] = property_cost
+# p_items['property_cost_integer'] = property_cost_integer
+# p_items['property_cost_currency'] = property_cost_currency
+# p_items['property_eircode'] = property_eircode
+# p_items['property_bedrooms'] = property_bedrooms
+# p_items['property_bathrooms'] = property_bathrooms
+# p_items['property_square'] = property_square
+# p_items['property_type'] = property_type
+# p_items['property_advertise_type'] = property_advertise_type
+# p_items['property_source_language'] = property_source_language
+# p_items['property_description'] = property_description
+# p_items['property_description_source'] = property_description_source
+# p_items['property_overview'] = property_overview
+# p_items['property_facilities'] = property_facilities
+# p_items['property_features'] = property_features
+# p_items['property_photo'] = property_photo
+# p_items['property_photos'] = property_photos
+# p_items['property_coordinates'] = property_coordinates
+# p_items['property_renewed'] = property_renewed
+# p_items['property_shorter'] = property_shorter
+# p_items['property_agent'] = property_agent
+# p_items['property_agent_photo'] = property_agent_photo
+# p_items['property_agency'] = property_agency
+# p_items['property_agency_licence'] = property_agency_licence
+# p_items['property_agency_link'] = property_agency_link
+# p_items['property_slug'] = property_slug
+# p_items['date_time'] = date_time
+
+
+# a_items['agency_source_website'] = agency_source_website
+# a_items['agency_website_country'] = agency_website_country
+# a_items['agency_link'] = agency_link
+# a_items['agency_website'] = agency_website
+# a_items['agency_name'] = agency_name
+# a_items['agency_logo'] = agency_logo
+# a_items['agency_overview'] = agency_overview
+# a_items['agency_phone'] = agency_phone
+# a_items['agency_licence_number'] = agency_licence_number
+# a_items['agency_details'] = agency_details
+# a_items['agency_agents_details'] = agency_agents_details
+# a_items['agency_slug'] = agency_slug
+# a_items['date_time'] = date_time

@@ -13,9 +13,12 @@ class Normalization:
     def normalize_advertise_type(self, value):
         result = (
             'Sale' if value == 'Sale'
+                      or value == 'sale'
                       or value == 1
             else 'Rent' if value == 'Rent'
+                           or value == 'rent'
                            or value == 2
+            else 'Auction' if value == 'auction'
             else 'Other'
         )
         return result
@@ -28,14 +31,17 @@ class Normalization:
                       or value == 'ПАРЦЕЛ'
                       or value == 'ЗЕМЕДЕЛСКА ЗЕМЯ'
             else 'Farmhouse' if value == 'Farmhouse'
+                                or value == 'Rustico - Casale'
             else 'Airspace' if value == 'Airspace'
 
             else 'House' if value == 'КЪЩА'
                             or value == 'ВИЛА'
                             or value == 'Rural property'
                             or value == 'House or chalet'
+                            or value == 'Casa indipendente'
             else 'Palace' if value == 'Palace/Castle/Manor'
             else 'Penthouse' if value == 'Penthouse'
+                                or value == 'Attico - Mansarda'
             else 'Terraced House' if value == 'Terraced House'
                                      or value == 'Terrace'
                                      or value == 'End of Terrace'
@@ -63,6 +69,7 @@ class Normalization:
                                 or value == 'Intermediate floors'
                                 or value == 'Ground floor'
                                 or value == 'Planta baja'
+                                or value == 'Appartamento'
             else 'Penthouse' if value == 'Penthouse'
             else 'Duplex apartment' if value == 'Duplex apartment'
                                        or value == 'Duplex'
@@ -70,10 +77,10 @@ class Normalization:
             else 'Studio' if value == 'Studio'
                              or value == 'Study'
                              or value == 'Studio Apartment'
-            else 'Apartment' if value == 'Apartment'
             else 'Room' if value == 'Room'
             else 'Maisonette' if value == 'Maisonette'
             else 'Townhouse' if value == 'Townhouse'
+                                or value == 'Villetta a schiera'
             else 'Mixed units' if value == 'Block of apartments/mixed units'
             else 'COVID-19 Accommodation' if value == 'COVID-19 Accommodation'
 

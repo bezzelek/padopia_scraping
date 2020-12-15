@@ -28,3 +28,12 @@ class Geolocation:
         else:
             result = None
         return result
+
+    def get_address_from_coordinates(self, latitude, longitude):
+        if latitude is not None and longitude is not None:
+            coordinates = latitude + ', ' + longitude
+            location = self.geolocation_client.reverse(coordinates, language='en')
+            result = location.address
+            return result
+        else:
+            return None

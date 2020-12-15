@@ -29,8 +29,12 @@ class UploadPhoto:
         urls = photos_list
         tasks = []
         async with aiohttp.ClientSession() as session:
-            for url in urls:
-                task = asyncio.create_task(self.get_data(url, session))
+            if type(urls) == list:
+                for url in urls:
+                    task = asyncio.create_task(self.get_data(url, session))
+                    tasks.append(task)
+            else:
+                task = asyncio.create_task(self.get_data(urls, session))
                 tasks.append(task)
             await asyncio.gather(*tasks)
         result = [item._result for item in tasks]
@@ -41,7 +45,10 @@ class UploadPhoto:
             logger.info('Downloading photo...')
 
             file = await response.read()
-            file_name = os.path.basename(url)
+            file_name_get = os.path.split(url)
+            file_name_pref = os.path.basename(file_name_get[0])
+            file_name_suf = os.path.basename(file_name_get[1])
+            file_name = file_name_pref + '_' + file_name_suf
 
             tasks = []
             task = asyncio.create_task(self.transfer_to_db(file, file_name))
