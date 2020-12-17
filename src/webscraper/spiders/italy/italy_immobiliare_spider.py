@@ -18,7 +18,7 @@ logger = getLogger()
 
 class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation):
     logger.info('Launching Italy Immobiliare spider...')
-    name = 'Italy'
+    name = 'Italy Immobiliare'
     start_urls = [
         'https://www.immobiliare.it/'
     ]

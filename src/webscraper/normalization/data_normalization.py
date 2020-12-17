@@ -15,9 +15,11 @@ class Normalization:
             'Sale' if value == 'Sale'
                       or value == 'sale'
                       or value == 1
+                      or value == 'acheter'
             else 'Rent' if value == 'Rent'
                            or value == 'rent'
                            or value == 2
+                           or value == 'louer'
             else 'Auction' if value == 'auction'
             else 'Other'
         )
@@ -39,7 +41,12 @@ class Normalization:
                             or value == 'Rural property'
                             or value == 'House or chalet'
                             or value == 'Casa indipendente'
+                            or value == 'Maison'
+                            or value == 'Hôtel particulier'
+                            or value == 'Manoir'
+                            or value == 'Propriété'
             else 'Palace' if value == 'Palace/Castle/Manor'
+                             or value == 'Château'
             else 'Penthouse' if value == 'Penthouse'
                                 or value == 'Attico - Mansarda'
             else 'Terraced House' if value == 'Terraced House'
@@ -56,6 +63,7 @@ class Normalization:
             else 'Parking Space' if value == 'Garage/Parking Space'
 
             else 'Flat' if value == 'Flat'
+                           or value == 'Chambre'
             else 'Attic' if value == 'Attic'
             else 'Apartment' if value == 'Apartment'
                                 or value == '1-СТАЕН'
@@ -70,6 +78,7 @@ class Normalization:
                                 or value == 'Ground floor'
                                 or value == 'Planta baja'
                                 or value == 'Appartamento'
+                                or value == 'Appartement'
             else 'Penthouse' if value == 'Penthouse'
             else 'Duplex apartment' if value == 'Duplex apartment'
                                        or value == 'Duplex'
