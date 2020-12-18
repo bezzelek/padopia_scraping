@@ -32,9 +32,11 @@ class Normalization:
                       or value == 'Site'
                       or value == 'ПАРЦЕЛ'
                       or value == 'ЗЕМЕДЕЛСКА ЗЕМЯ'
+                      or value == 'Land'
             else 'Farmhouse' if value == 'Farmhouse'
                                 or value == 'Rustico - Casale'
             else 'Airspace' if value == 'Airspace'
+            else 'Island' if value == 'Island'
 
             else 'House' if value == 'КЪЩА'
                             or value == 'ВИЛА'
@@ -56,6 +58,7 @@ class Normalization:
             else 'Bungalow' if value == 'Bungalow'
             else 'Boathouse' if value == 'Boathouse'
             else 'Detached' if value == 'Detached'
+                               or value == 'Detached house'
             else 'Semi-detached' if value == 'Single-family semi-detached'
                                     or value == 'Semi-D'
             else 'Country house' if value == 'Country house'
@@ -93,6 +96,7 @@ class Normalization:
             else 'Mixed units' if value == 'Block of apartments/mixed units'
             else 'COVID-19 Accommodation' if value == 'COVID-19 Accommodation'
 
+            else 'Business' if value == 'Business'
             else 'Office' if value == 'Office'
                              or value == 'ОФИС'
             else 'Warehouse' if value == 'Warehouse'
@@ -101,6 +105,7 @@ class Normalization:
             else 'Bars & Restaurants' if value == 'Bars & Restaurants'
             else 'Catering' if value == 'Catering (commercial)'
             else 'Hotel' if value == 'Hotel/Resort/Hostel/Guest House'
+                            or value == 'Hotel'
             else 'Nightclub' if value == 'Nightclub'
             else 'House of Character' if value == 'House of Character'
 
