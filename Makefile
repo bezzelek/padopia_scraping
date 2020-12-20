@@ -44,6 +44,15 @@ spain_fotocasa:
 spain_idealista:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/spain_idealista_property_spider.py
 
+italy:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/italy/italy_immobiliare_spider.py
+
+france:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/france/france_immobilier_spider.py
+
+greece:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/greece/greece_grekodom_spider.py
+
 ### Project shortcuts for debugging
 celery_test:
 	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
@@ -65,5 +74,14 @@ spain_fotocasa_test:
 
 spain_idealista_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain_idealista_property_spider.py
+
+italy_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/italy/italy_immobiliare_spider.py
+
+france_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/france/france_immobilier_spider.py
+
+greece_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/greece/greece_grekodom_spider.py
 
 ### Linters
