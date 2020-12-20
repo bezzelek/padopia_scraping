@@ -2,7 +2,10 @@ from celery.schedules import crontab
 from celery.task import periodic_task
 
 from webscraper.spiders.bulgaria.bulgaria_imot_spider import BulgariaImotScraper
+from webscraper.spiders.france.france_immobilier_spider import FranceImmobilierScraper
+from webscraper.spiders.greece.greece_grekodom_spider import GreeceGrekodomScraper
 from webscraper.spiders.ireland.ireland_daft_spider import IrelandDaftScraper
+from webscraper.spiders.italy.italy_immobiliare_spider import ItalyImmobiliareScraper
 from webscraper.spiders.malta.malta_dardingli_spider import MaltaDardingliScraper
 from webscraper.spiders.spain.spain_fotocasa_spider import SpainFotocasaScraper
 from webscraper.spiders.spain.spain_idealista_alava_spider import SpainIdealistaAlavaScraper
@@ -69,15 +72,33 @@ def run_ireland_daft():
     scraper.run_spiders()
 
 
+@periodic_task(run_every=crontab(hour=1, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
+def run_italy_immobiliare():
+    scraper = ItalyImmobiliareScraper()
+    scraper.run_spiders()
+
+
 @periodic_task(run_every=crontab(hour=6, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
 def run_malta_dardingli():
     scraper = MaltaDardingliScraper()
     scraper.run_spiders()
 
 
+@periodic_task(run_every=crontab(hour=7, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
+def run_france_immobilier():
+    scraper = FranceImmobilierScraper()
+    scraper.run_spiders()
+
+
 @periodic_task(run_every=crontab(hour=12, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
 def run_bulgaria_imot():
     scraper = BulgariaImotScraper()
+    scraper.run_spiders()
+
+
+@periodic_task(run_every=crontab(hour=13, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
+def run_greece_grekodom():
+    scraper = GreeceGrekodomScraper()
     scraper.run_spiders()
 
 
@@ -91,6 +112,7 @@ def run_spain_fotocasa():
 def run_spain_idealista():
     scraper = SpainIdealistaPropertyScraper()
     scraper.run_spiders()
+
 
 @periodic_task(run_every=crontab(hour=0, minute=0, day_of_week='sat,mon,wed'), time_limit=60 * 60 * 23 * 2)
 def run_spain_idealista_alava():
