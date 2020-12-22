@@ -1,5 +1,5 @@
 import os
-# import json
+import json
 import scrapy
 import requests
 
@@ -12,12 +12,12 @@ from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
 from src.webscraper.normalization.process_photo import UploadPhoto
-from src.webscraper.normalization.geolocate import Geolocation
+
 
 logger = getLogger()
 
 
-class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation):
+class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto):
     logger.info('Launching France Immobilier spider...')
     name = 'France Immobilier'
     start_urls = [
@@ -36,7 +36,6 @@ class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocat
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.storage_client = self.start_client_storage()
-        self.geolocation_client = self.start_geolocation_client()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -120,9 +119,19 @@ class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocat
         else:
             property_agency_link = None
 
-        property_address = self.get_address_from_coordinates(
-            property_coordinates['latitude'], property_coordinates['longitude']
-        )
+        property_code = self.get_digits(property_link)
+        rest_link = 'https://immobilier.lefigaro.fr/rest/classifieds/' + property_code
+        rest_request = requests.get(rest_link)
+        rest_response = rest_request.text
+        data = json.loads(rest_response)
+
+        # district = self.get_no_spaces(data['location']['localInformation'])
+        city = data['location']['cityLabel']
+        # department = data['location']['departmentLabel']
+        country = data['location']['countryLabel']
+        lim = ', '
+        property_address = self.check_if_exists(city + lim + country)
+
         property_photos_extract = self.get_list(property_script, 'class="item js-img-popup">', 'class="image-link')[1:]
         property_photos_links = []
         for element in property_photos_extract:
@@ -184,7 +193,6 @@ class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocat
                     agency_logo = agency_logo_store[0]
             except:
                 agency_logo = None
-            property_code = self.get_digits(property_link)
             agency_phone_link = 'https://immobilier.lefigaro.fr/rest/classifieds/' + property_code + '/phone'
             agency_phone_request = requests.get(agency_phone_link)
             agency_phone_response = agency_phone_request.text
@@ -192,11 +200,6 @@ class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocat
             agency_phone = self.check_if_exists(agency_phone_extract)
             agency_slug = self.get_slug(agency_name)
             date_time = datetime.utcnow()
-
-            # test_link = 'https://immobilier.lefigaro.fr/rest/classifieds/' + property_code
-            # test_request = requests.get(test_link)
-            # test_response = test_request.text
-            # data = json.loads(test_response)
 
             a_items['agency_source_website'] = agency_source_website
             a_items['agency_website_country'] = agency_website_country

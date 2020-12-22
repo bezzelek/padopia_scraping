@@ -12,12 +12,12 @@ from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
 from src.webscraper.normalization.process_photo import UploadPhoto
-from src.webscraper.normalization.geolocate import Geolocation
+
 
 logger = getLogger()
 
 
-class GreeceGrekodomSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation):
+class GreeceGrekodomSpider(scrapy.Spider, Normalization, UploadPhoto):
     logger.info('Launching Greece Grekodom spider...')
     name = 'Greece Grekodom'
     start_urls = [
@@ -35,7 +35,6 @@ class GreeceGrekodomSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocatio
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.storage_client = self.start_client_storage()
-        self.geolocation_client = self.start_geolocation_client()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -68,9 +67,13 @@ class GreeceGrekodomSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocatio
             'latitude': latitude,
             'longitude': longitude,
         }
-        property_address = self.get_address_from_coordinates(
-            property_coordinates['latitude'], property_coordinates['longitude']
-        )
+
+        property_address_extract = self.get_text(property_script, '"name":"', '"offers"')
+        property_address = self.get_text(property_address_extract, 'in ', '",')
+
+        # property_address = self.get_address_from_coordinates(
+        #     property_coordinates['latitude'], property_coordinates['longitude']
+        # )
         property_cost = self.get_text(property_script, '"price":"', '"')
         property_cost_integer = self.get_digits(property_cost)
         property_cost_currency_extract = self.get_text(property_script, '"priceCurrency":"', '"')

@@ -14,12 +14,12 @@ from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
 from src.webscraper.normalization.process_photo import UploadPhoto
-from src.webscraper.normalization.geolocate import Geolocation
+
 
 logger = getLogger()
 
 
-class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation):
+class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto):
     logger.info('Launching Bulgaria spider...')
     name = 'Imot'
     start_urls = [
@@ -37,7 +37,6 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation)
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.storage_client = self.start_client_storage()
-        self.geolocation_client = self.start_geolocation_client()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -100,13 +99,13 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation)
 
         """Property address"""
         property_address_original = self.get_text(property_document_extract, "Местоположение: <b>", "</b>")
-        property_address_check = self.check_if_exists(property_address_original)
-        if property_address_check is not None:
-            property_address = self.get_address(property_address_original)
-            property_coordinates = self.get_coordinates(property_address_original)
-        else:
-            property_address = None
-            property_coordinates = None
+        property_address = self.check_if_exists(property_address_original)
+        # if property_address_check is not None:
+        #     property_address = self.get_address(property_address_original)
+        #     property_coordinates = self.get_coordinates(property_address_original)
+        # else:
+        #     property_address = None
+        #     property_coordinates = None
 
         """Property cost"""
         property_cost = self.get_text(property_document_extract, '<strong style="color: #900">', "</strong>")
@@ -184,7 +183,7 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation)
         p_items['property_website_country'] = property_website_country
         p_items['property_link'] = property_link
         p_items['property_address'] = property_address
-        p_items['property_coordinates'] = property_coordinates
+        # p_items['property_coordinates'] = property_coordinates
         p_items['property_cost'] = property_cost
         p_items['property_cost_integer'] = property_cost_integer
         p_items['property_cost_currency'] = property_cost_currency
