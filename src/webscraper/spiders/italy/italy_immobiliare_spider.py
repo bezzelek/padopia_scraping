@@ -11,12 +11,12 @@ from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
 from src.webscraper.normalization.process_photo import UploadPhoto
-from src.webscraper.normalization.geolocate import Geolocation
+
 
 logger = getLogger()
 
 
-class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation):
+class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
     logger.info('Launching Italy Immobiliare spider...')
     name = 'Italy Immobiliare'
     start_urls = [
@@ -34,7 +34,6 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocat
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.storage_client = self.start_client_storage()
-        self.geolocation_client = self.start_geolocation_client()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -129,9 +128,16 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocat
         else:
             property_coordinates = None
 
-        property_address = self.get_address_from_coordinates(
-            property_coordinates['latitude'], property_coordinates['longitude']
-        )
+        city = data['listing']['properties'][0]['location']['city']['name']
+        province = data['listing']['properties'][0]['location']['province']['name']
+        region = data['listing']['properties'][0]['location']['region']['name']
+        nation = data['listing']['properties'][0]['location']['nation']['name']
+        lim = ', '
+        property_address = city + lim + province + lim + region + lim + nation
+
+        # property_address = self.get_address_from_coordinates(
+        #     property_coordinates['latitude'], property_coordinates['longitude']
+        # )
 
         property_slug = self.get_slug(property_address)
         property_renewed = datetime.now().strftime('%d %B %Y')

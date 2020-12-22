@@ -11,13 +11,12 @@ from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
 from src.webscraper.normalization.process_photo import UploadPhoto
-from src.webscraper.normalization.geolocate import Geolocation
 
 
 logger = getLogger()
 
 
-class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocation):
+class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto):
     logger.info('Launching Malta Dardingli spider...')
     name = 'Dardingli'
     start_urls = [
@@ -35,7 +34,6 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocatio
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.storage_client = self.start_client_storage()
-        self.geolocation_client = self.start_geolocation_client()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -133,12 +131,12 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocatio
             proterty_address_settlement_type_extract = self.get_text(property_address_extract, 'title="', '"')
             proterty_address_settlement_type = self.get_no_spaces(proterty_address_settlement_type_extract)
             property_address_settlement = self.get_text(property_address_extract, '-->', '<!--')
-            property_address_raw = property_address_settlement + ' ' + proterty_address_settlement_type + ', Malta'
-            property_address = self.get_address(property_address_raw)
-            property_coordinates = self.get_coordinates(property_address_raw)
-        else:
-            property_address = None
-            property_coordinates = None
+            property_address = property_address_settlement + ' ' + proterty_address_settlement_type + ', Malta'
+            # property_address = self.get_address(property_address_raw)
+            # property_coordinates = self.get_coordinates(property_address_raw)
+        # else:
+        #     property_address = None
+            # property_coordinates = None
         property_type_extract = self.get_text(property_script, 'type="video/mp4">', 'src=')
         property_type_pretty = self.get_text(property_type_extract, 'title="', ',')
         property_type_no_commas = self.get_no_punctuation(property_type_pretty)
@@ -164,7 +162,7 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto, Geolocatio
         items['property_website_country'] = property_website_country
         items['property_link'] = property_link
         items['property_address'] = property_address
-        items['property_coordinates'] = property_coordinates
+        # items['property_coordinates'] = property_coordinates
         items['property_cost'] = property_cost
         items['property_cost_integer'] = property_cost_integer
         items['property_cost_currency'] = property_cost_currency
