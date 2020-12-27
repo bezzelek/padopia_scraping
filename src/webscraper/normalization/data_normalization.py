@@ -17,10 +17,12 @@ class Normalization:
                       or value == 'sale'
                       or value == 1
                       or value == 'acheter'
+                      or value == 'For sale'
             else 'Rent' if value == 'Rent'
                            or value == 'rent'
                            or value == 2
                            or value == 'louer'
+                           or value == 'For rent'
             else 'Auction' if value == 'auction'
             else 'Other'
         )
@@ -41,6 +43,7 @@ class Normalization:
                       or value == 'zeytinlik'
                       or value == 'sit-alani'
                       or value == 'ciftlik'
+                      or value == '3 - Land plot'
             else 'Farmhouse' if value == 'Farmhouse'
                                 or value == 'Rustico - Casale'
                                 or value == 'çiftlik-evi'
@@ -71,6 +74,7 @@ class Normalization:
                             or value == 'genel'
                             or value == 'bina'
                             or value == 'kosk'
+                            or value == '2 - House / Villa'
             else 'Palace' if value == 'Palace/Castle/Manor'
                              or value == 'Château'
             else 'Penthouse' if value == 'Penthouse'
@@ -110,6 +114,7 @@ class Normalization:
                                 or value == 'yalı-dairesi'
                                 or value == 'apartman-dairesi'
                                 or value == 'toplu-konut-icin'
+                                or value == '1 - Apartment'
             else 'Flat' if value == 'Flat'
                            or value == 'Chambre'
             else 'Attic' if value == 'Attic'
@@ -147,6 +152,7 @@ class Normalization:
                             or value == 'Hotel'
                             or value == 'otel'
                             or value == 'turizm-imarli'
+                            or value == '5 - Hotel'
             else 'Nightclub' if value == 'Nightclub'
             else 'House of Character' if value == 'House of Character'
 
@@ -158,6 +164,7 @@ class Normalization:
                                  or value == 'sanayi-imarli'
                                  or value == 'benzin-istasyonu'
                                  or value == 'atolye'
+                                 or value == '4 - Commercial property'
             else 'Education' if value == 'Education (commercial)'
 
             else 'Parking Space' if value == 'Garage/Parking Space'
