@@ -22,6 +22,8 @@ check:
 	docker-compose ps && docker ps
 # docker attach <container_id>
 
+#
+##
 ### Project shortcuts
 celery:
 	docker-compose run -d --rm scraper_launch celery -E -A root worker --beat --loglevel=info
@@ -53,6 +55,14 @@ france:
 greece:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/greece/greece_grekodom_spider.py
 
+turkey:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/turkey/turkey_emlakjet_spider.py
+
+croatia:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/croatia/croatia_croatiaestate_spider.py
+
+#
+##
 ### Project shortcuts for debugging
 celery_test:
 	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
@@ -84,4 +94,12 @@ france_test:
 greece_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/greece/greece_grekodom_spider.py
 
+turkey_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/turkey/turkey_emlakjet_spider.py
+
+croatia_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/croatia/croatia_croatiaestate_spider.py
+
+#
+##
 ### Linters
