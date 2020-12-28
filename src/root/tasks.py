@@ -2,6 +2,7 @@ from celery.schedules import crontab
 from celery.task import periodic_task
 
 from webscraper.spiders.bulgaria.bulgaria_imot_spider import BulgariaImotScraper
+from webscraper.spiders.croatia.croatia_croatiaestate_spider import CroatiaCroatiaestateScraper
 from webscraper.spiders.france.france_immobilier_spider import FranceImmobilierScraper
 from webscraper.spiders.greece.greece_grekodom_spider import GreeceGrekodomScraper
 from webscraper.spiders.ireland.ireland_daft_spider import IrelandDaftScraper
@@ -64,6 +65,7 @@ from webscraper.spiders.spain.spain_idealista_vizcaya_spider import SpainIdealis
 from webscraper.spiders.spain.spain_idealista_zamora_spider import SpainIdealistaZamoraScraper
 from webscraper.spiders.spain.spain_idealista_zaragoza_spider import SpainIdealistaZaragozaScraper
 from webscraper.spiders.spain_idealista_property_spider import SpainIdealistaPropertyScraper
+from webscraper.spiders.turkey.turkey_emlakjet_spider import TurkeyEmlakjetScraper
 
 
 @periodic_task(run_every=crontab(hour=0, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
@@ -78,6 +80,12 @@ def run_italy_immobiliare():
     scraper.run_spiders()
 
 
+@periodic_task(run_every=crontab(hour=2, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
+def run_turkey_emlakjet():
+    scraper = TurkeyEmlakjetScraper()
+    scraper.run_spiders()
+
+
 @periodic_task(run_every=crontab(hour=6, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
 def run_malta_dardingli():
     scraper = MaltaDardingliScraper()
@@ -87,6 +95,12 @@ def run_malta_dardingli():
 @periodic_task(run_every=crontab(hour=7, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
 def run_france_immobilier():
     scraper = FranceImmobilierScraper()
+    scraper.run_spiders()
+
+
+@periodic_task(run_every=crontab(hour=8, minute=5, day_of_week='mon,tue,wed,thu,fri,sun,sat'), time_limit=60 * 60 * 23)
+def run_croatia_croatiaestate():
+    scraper = CroatiaCroatiaestateScraper()
     scraper.run_spiders()
 
 
