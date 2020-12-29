@@ -37,25 +37,38 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
-        region_urls_extract = response.xpath(
+
+        """Getting regions pages"""
+        region_links_extract = response.xpath(
             "//li[@class='nd-listMeta__item nd-listMeta__item--meta']/a/@href"
         ).extract()
 
-        region_sale_urls = []
-        for url in region_urls_extract:
-            link = url[:-7]
-            region_sale_urls.append(link)
+        """Going to regions pages to get departments links"""
+        for link in region_links_extract:
+            yield scrapy.Request(url=link, callback=self.parse_departments_urls, priority=15)
 
-        region_rent_urls = []
-        for url in region_sale_urls:
+    def parse_departments_urls(self, response, **kwargs):
+        link_response = response.text
+
+        """Getting departments links"""
+        urls = self.get_list(link_response, '"nd-listMeta__link" href="', '"')[1:]
+        departments_sale_urls = []
+        for url in urls:
+            departments_sale_urls.append(url)
+
+        departments_rent_urls = []
+        for url in departments_sale_urls:
             link = url.replace('vendita-case', 'affitto-case')
-            region_rent_urls.append(link)
+            departments_rent_urls.append(link)
 
-        region_urls = region_sale_urls + region_rent_urls
-        for link in region_urls:
-            yield scrapy.Request(url=link, callback=self.parse_search_page, priority=1)
+        departments_urls = departments_sale_urls + departments_rent_urls
+
+        """Going to departments search's pages"""
+        for link in departments_urls:
+            yield scrapy.Request(url=link, callback=self.parse_search_page, priority=50)
 
     def parse_search_page(self, response, **kwargs):
+
         """Getting links of property pages in particular search page"""
         property_urls = response.xpath("//div[@class='listing-item_body--content']/p/a/@href").extract()
         for link in property_urls:
@@ -66,7 +79,7 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
         next_page = response.xpath("//ul[@class='pull-right pagination']/li[1]/a/@href").get()
         if next_page is not None:
             logger.info('Following pagination and going to next page...')
-            yield response.follow(next_page, callback=self.parse, priority=15)
+            yield response.follow(next_page, callback=self.parse, priority=100)
 
     def parse_property_content(self, response, **kwargs):
         p_items = PropertyItem()
@@ -78,46 +91,13 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
         script = response.xpath('//script[@id="js-hydration"]/text()').get()
         data = json.loads(script)
 
+        """Cost"""
         property_cost = data['listing']['properties'][0]['price']['formattedPriceTop'][0]
         property_cost_integer = str(data['listing']['properties'][0]['price']['price'])
         property_cost_currency = self.normalize_currency(data['listing']['properties'][0]['price']['currency'])
         property_square_extract = data['listing']['properties'][0]['surfaceValue']
-        if property_square_extract is not None:
-            property_square_shorter = self.get_shorter(property_square_extract, ' ')
-            property_square = self.get_digits(property_square_shorter)
-        else:
-            property_square = None
-        property_source_language = 'Italy'
-        property_description_source = data['listing']['properties'][0]['description']
-        property_type = self.normalize_property_type(data['listing']['properties'][0]['typology']['name'])
 
-        try:
-            property_bedrooms = str(data['trovakasa']['locMin'])
-        except:
-            property_bedrooms = None
-        try:
-            property_bathrooms = str(data['trovakasa']['bagni'])
-        except:
-            property_bathrooms = None
-        property_advertise_type = self.normalize_advertise_type(data['listing']['contract']['type'])
-        try:
-            property_agency = data['listing']['advertiser']['agency']['displayName']
-            property_agency_link = data['listing']['advertiser']['agency']['agencyUrl']
-        except:
-            property_agency = None
-            property_agency_link = None
-
-        property_photos_extract = data['listing']['properties'][0]['multimedia']['photos']
-        if property_photos_extract is not None:
-            property_photos_links = []
-            for element in property_photos_extract:
-                photo = element['urls']['large']
-                property_photos_links.append(photo)
-            property_photos = self.store_images(property_photos_links)
-            property_photo = property_photos[0]
-        else:
-            property_photos = None
-            property_photo = None
+        """Address"""
         latitude = str(data['listing']['properties'][0]['location']['latitude'])
         longitude = str(data['listing']['properties'][0]['location']['longitude'])
         if latitude is not None and longitude is not None:
@@ -135,10 +115,49 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
         lim = ', '
         property_address = city + lim + province + lim + region + lim + nation
 
-        # property_address = self.get_address_from_coordinates(
-        #     property_coordinates['latitude'], property_coordinates['longitude']
-        # )
+        """Basic"""
+        if property_square_extract is not None:
+            property_square_shorter = self.get_shorter(property_square_extract, ' ')
+            property_square = self.get_digits(property_square_shorter)
+        else:
+            property_square = None
+        try:
+            property_bedrooms = str(data['trovakasa']['locMin'])
+        except:
+            property_bedrooms = None
+        try:
+            property_bathrooms = str(data['trovakasa']['bagni'])
+        except:
+            property_bathrooms = None
+        property_type = self.normalize_property_type(data['listing']['properties'][0]['typology']['name'])
+        property_advertise_type = self.normalize_advertise_type(data['listing']['contract']['type'])
 
+        """Description"""
+        property_source_language = 'Italy'
+        property_description_source = data['listing']['properties'][0]['description']
+
+        """Photos"""
+        property_photos_extract = data['listing']['properties'][0]['multimedia']['photos']
+        if property_photos_extract is not None:
+            property_photos_links = []
+            for element in property_photos_extract:
+                photo = element['urls']['large']
+                property_photos_links.append(photo)
+            property_photos = self.store_images(property_photos_links)
+            property_photo = property_photos[0]
+        else:
+            property_photos = None
+            property_photo = None
+
+        """Agency"""
+        try:
+            property_agency = data['listing']['advertiser']['agency']['displayName']
+            property_agency_link = data['listing']['advertiser']['agency']['agencyUrl']
+        except:
+            property_agency = None
+            property_agency_link = None
+
+        """Technical"""
         property_slug = self.get_slug(property_address)
         property_renewed = datetime.now().strftime('%d %B %Y')
         date_time = datetime.utcnow()
@@ -171,10 +190,13 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
 
             agency_source_website = 'https://www.immobiliare.it/'
             agency_website_country = 'Italy'
-            agency_link = data['listing']['advertiser']['agency']['agencyUrl']
+
+            """Base"""
             agency_name = data['listing']['advertiser']['agency']['displayName']
+            agency_link = data['listing']['advertiser']['agency']['agencyUrl']
             agency_phone = data['listing']['advertiser']['agency']['phones'][0]['value']
-            agency_slug = self.get_slug(agency_name)
+
+            """Logo"""
             try:
                 agency_logo_check = data['listing']['advertiser']['agency']['imageUrl']
             except:
@@ -185,6 +207,9 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
                 agency_logo = agency_logo_store[0]
             else:
                 agency_logo = None
+
+            """Technical"""
+            agency_slug = self.get_slug(agency_name)
             date_time = datetime.utcnow()
 
             a_items['agency_source_website'] = agency_source_website
