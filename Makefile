@@ -28,6 +28,9 @@ check:
 celery:
 	docker-compose run -d --rm scraper_launch celery -E -A root worker --beat --loglevel=info
 
+accurate_address:
+	docker-compose run -d --rm scraper_launch python src/webscraper/normalization/accurate_address.py
+
 spain_property:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/spain/spain_idealista_property_spider.py
 
@@ -66,6 +69,9 @@ croatia:
 ### Project shortcuts for debugging
 celery_test:
 	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
+
+accurate_address_test:
+	docker-compose run --rm scraper_launch python src/webscraper/normalization/accurate_address.py
 
 spain_property_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain/spain_idealista_property_spider.py
