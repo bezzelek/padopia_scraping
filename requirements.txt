@@ -17,6 +17,7 @@ celery==4.4.6
 
 # Database
 pymongo==3.11.1
+dnspython==2.0.0
 
 # Required for proxies def()
 requests==2.25.0
