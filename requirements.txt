@@ -13,7 +13,7 @@ aiohttp==3.7.3
 geopy==2.0.0
 
 # Schudeler
-celery==4.4.6
+celery==5.0.5
 
 # Database
 pymongo==3.11.1
