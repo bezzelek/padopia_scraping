@@ -3,6 +3,7 @@ from celery.schedules import crontab
 
 from root.settings import BROKER_URL, CELERY_WORKERS
 from webscraper.normalization.accurate_address import accurate_address
+from webscraper.processing.images.thumbnail_main_image import make_thumbnails
 from webscraper.processing.prices.actual_prices import update_prices
 from webscraper.processing.prices.currency_convertation import convert_currency
 from webscraper.spiders.bulgaria.bulgaria_imot_spider import BulgariaImotScraper
@@ -29,6 +30,12 @@ app.conf.update({
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(
+        crontab(hour=6, minute=40),
+        run_make_thumbnails.s(),
+        time_limit=60 * 60 * 23
+    )
+
     sender.add_periodic_task(
         crontab(hour=6, minute=45),
         run_convert_currency.s(),
@@ -121,6 +128,11 @@ def run_convert_currency():
 @app.task
 def run_update_prices():
     update_prices()
+
+
+@app.task
+def run_make_thumbnails():
+    make_thumbnails()
 
 
 @app.task

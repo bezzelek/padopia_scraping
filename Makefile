@@ -64,6 +64,15 @@ turkey:
 croatia:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/croatia/croatia_croatiaestate_spider.py
 
+convert_prices:
+	docker-compose run -d --rm scraper_launch python src/webscraper/processing/prices/currency_convertation.py
+
+update_prices:
+	docker-compose run -d --rm scraper_launch python src/webscraper/processing/prices/actual_prices.py
+
+thumbnail_main:
+	docker-compose run -d --rm scraper_launch python src/webscraper/processing/images/thumbnail_main_image.py
+
 #
 ##
 ### Project shortcuts for debugging
@@ -105,6 +114,15 @@ turkey_test:
 
 croatia_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/croatia/croatia_croatiaestate_spider.py
+
+convert_prices:
+	docker-compose run --rm scraper_launch python src/webscraper/processing/prices/currency_convertation.py
+
+update_prices:
+	docker-compose run --rm scraper_launch python src/webscraper/processing/prices/actual_prices.py
+
+thumbnail_main:
+	docker-compose run --rm scraper_launch python src/webscraper/processing/images/thumbnail_main_image.py
 
 #
 ##
