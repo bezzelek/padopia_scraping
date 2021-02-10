@@ -9,8 +9,14 @@ google-cloud-translate==3.0.1
 google-cloud-storage==1.33.0
 aiohttp==3.7.3
 
-# Geotranslate
+# Geolocation
 geopy==2.0.0
+
+# Image processing
+pillow==8.1.0
+
+# Currency converter
+CurrencyConverter==0.14.4
 
 # Schudeler
 celery==5.0.5
