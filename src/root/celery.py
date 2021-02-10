@@ -2,7 +2,7 @@ from celery import Celery
 from celery.schedules import crontab
 
 from root.settings import BROKER_URL, CELERY_WORKERS
-from webscraper.normalization.accurate_address import accurate_address
+from webscraper.processing.addresses.accurate_address import accurate_address
 from webscraper.processing.images.thumbnail_main_image import make_thumbnails
 from webscraper.processing.prices.actual_prices import update_prices
 from webscraper.processing.prices.currency_convertation import convert_currency
