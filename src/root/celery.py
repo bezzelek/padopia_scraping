@@ -3,6 +3,8 @@ from celery.schedules import crontab
 
 from root.settings import BROKER_URL, CELERY_WORKERS
 from webscraper.normalization.accurate_address import accurate_address
+from webscraper.processing.prices.actual_prices import update_prices
+from webscraper.processing.prices.currency_convertation import convert_currency
 from webscraper.spiders.bulgaria.bulgaria_imot_spider import BulgariaImotScraper
 from webscraper.spiders.croatia.croatia_croatiaestate_spider import CroatiaCroatiaestateScraper
 from webscraper.spiders.france.france_immobilier_spider import FranceImmobilierScraper
@@ -27,6 +29,18 @@ app.conf.update({
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(
+        crontab(hour=6, minute=45),
+        run_convert_currency.s(),
+        time_limit=60 * 60 * 23
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=6, minute=50),
+        run_update_prices.s(),
+        time_limit=60 * 60 * 23
+    )
+
     sender.add_periodic_task(
         crontab(hour=6, minute=55),
         run_accurate_address.s(),
@@ -97,6 +111,16 @@ def setup_periodic_tasks(sender, **kwargs):
 @app.task
 def run_accurate_address():
     accurate_address()
+
+
+@app.task
+def run_convert_currency():
+    convert_currency()
+
+
+@app.task
+def run_update_prices():
+    update_prices()
 
 
 @app.task
