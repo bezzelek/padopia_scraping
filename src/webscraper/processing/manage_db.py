@@ -11,8 +11,12 @@ def manage_db():
     collection_property = db['test_property']
 
     """Manage DB"""
+    # test = collection_property.update_many(
+    #     {}, {"$unset": {"property_price": 1}}
+    # )
+
     test = collection_property.update_many(
-        {}, {"$unset": {"property_price": 1}}
+        {}, {"$unset": {"property_photo_thumbnail": 1}}
     )
 
 
