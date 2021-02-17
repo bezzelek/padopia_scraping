@@ -78,6 +78,21 @@ class GreeceGrekodomSpider(scrapy.Spider, Normalization, UploadPhoto):
         property_cost_integer = self.get_digits(property_cost)
         property_cost_currency_extract = self.get_text(property_script, '"priceCurrency":"', '"')
         property_cost_currency = self.normalize_currency(property_cost_currency_extract)
+
+        property_price = {
+            'eur': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'source': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'price_last_update': datetime.utcnow(),
+        }
+
         property_type_extract = self.get_text(property_script, '"itemOffered":"', '"')
         property_type = self.normalize_property_type(property_type_extract)
         property_advertise_type_extract = self.get_text(property_script, '"name":"', '"')
@@ -167,6 +182,7 @@ class GreeceGrekodomSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_cost'] = property_cost
         p_items['property_cost_integer'] = property_cost_integer
         p_items['property_cost_currency'] = property_cost_currency
+        p_items['property_price'] = property_price
         p_items['property_bedrooms'] = property_bedrooms
         p_items['property_bathrooms'] = property_bathrooms
         p_items['property_square'] = property_square

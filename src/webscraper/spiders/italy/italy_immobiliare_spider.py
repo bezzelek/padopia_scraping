@@ -97,6 +97,20 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
         property_cost_currency = self.normalize_currency(data['listing']['properties'][0]['price']['currency'])
         property_square_extract = data['listing']['properties'][0]['surfaceValue']
 
+        property_price = {
+            'eur': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'source': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'price_last_update': datetime.utcnow(),
+        }
+
         """Address"""
         latitude = str(data['listing']['properties'][0]['location']['latitude'])
         longitude = str(data['listing']['properties'][0]['location']['longitude'])
@@ -169,6 +183,7 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_cost'] = property_cost
         p_items['property_cost_integer'] = property_cost_integer
         p_items['property_cost_currency'] = property_cost_currency
+        p_items['property_price'] = property_price
         p_items['property_bedrooms'] = property_bedrooms
         p_items['property_bathrooms'] = property_bathrooms
         p_items['property_square'] = property_square

@@ -39,7 +39,7 @@ def get_db_connection():
 def make_thumbnails():
     """Connecting to DB"""
     db = get_db_connection()
-    collection_property = db['test_property']
+    collection_property = db['property']
 
     """Getting number of properties without thumbnail images"""
     number_of_docs = collection_property.count_documents({

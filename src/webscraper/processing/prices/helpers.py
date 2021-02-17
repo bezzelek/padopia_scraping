@@ -178,10 +178,12 @@ def updating_document(
             {
                 '$set':
                     {
-                        'property_price.currency_iso': str(currency_iso),
-                        'property_price.amount': int(amount),
-                        'property_price.currency_symbol': str(currency_symbol),
-                        'property_price.amount_source': int(amount_source),
+                        'property_price.eur.amount': int(amount),
+                        'property_price.eur.currency_iso': 'EUR',
+                        'property_price.eur.currency_symbol': '€',
+                        'property_price.source.amount': int(amount_source),
+                        'property_price.source.currency_iso': str(currency_iso),
+                        'property_price.source.currency_symbol': str(currency_symbol),
                         'property_price.price_last_update': date_time,
                     }
             }

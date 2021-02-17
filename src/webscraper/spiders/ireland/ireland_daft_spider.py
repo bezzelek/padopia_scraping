@@ -157,6 +157,20 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
             property_cost_currency_pretty = self.get_letters(property_cost_currency_extract)
             property_cost_currency = property_cost_currency_pretty[:1]
 
+        property_price = {
+            'eur': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'source': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'price_last_update': datetime.utcnow(),
+        }
+
         try:
             property_agency_extract = final_data['seller']['branch']
             property_agency = self.check_if_exists(property_agency_extract)
@@ -172,6 +186,7 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_cost'] = property_cost
         p_items['property_cost_integer'] = property_cost_integer
         p_items['property_cost_currency'] = property_cost_currency
+        p_items['property_price'] = property_price
         p_items['property_square'] = property_square
         p_items['property_bedrooms'] = property_bedrooms
         p_items['property_bathrooms'] = property_bathrooms

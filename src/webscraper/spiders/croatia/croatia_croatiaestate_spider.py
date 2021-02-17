@@ -75,6 +75,20 @@ class CroatiaCroatiaestateSpider(scrapy.Spider, Normalization, UploadPhoto):
         property_cost_integer = self.get_digits(property_cost)
         property_cost_currency = self.normalize_currency(property_cost[-1:])
 
+        property_price = {
+            'eur': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'source': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'price_last_update': datetime.utcnow(),
+        }
+
         """Basic info"""
         property_bedrooms_extract = self.get_text(property_script, 'title">Rooms</dd>', '/dd>')
         property_bedrooms = self.check_if_exists(self.get_text(property_bedrooms_extract, '">', '<'))
@@ -127,6 +141,7 @@ class CroatiaCroatiaestateSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_cost'] = property_cost
         p_items['property_cost_integer'] = property_cost_integer
         p_items['property_cost_currency'] = property_cost_currency
+        p_items['property_price'] = property_price
         p_items['property_bedrooms'] = property_bedrooms
         p_items['property_bathrooms'] = property_bathrooms
         p_items['property_square'] = property_square
