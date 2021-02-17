@@ -12,7 +12,7 @@ def convert_currency():
     """Search details"""
     query = {
         '$and': [
-            {'property_price.currency_iso': {'$exists': False}},
+            {'property_price.eur.amount': {'$exists': False}},
             {'property_cost_currency': {'$exists': True}},
         ]
     }

@@ -14,6 +14,7 @@ class PropertyItem(scrapy.Item):
     property_cost = scrapy.Field()
     property_cost_integer = scrapy.Field()
     property_cost_currency = scrapy.Field()
+    property_price = scrapy.Field()
     property_eircode = scrapy.Field()
     property_bedrooms = scrapy.Field()
     property_bathrooms = scrapy.Field()
@@ -65,6 +66,7 @@ class AgencyItem(scrapy.Item):
 # p_items['property_cost'] = property_cost
 # p_items['property_cost_integer'] = property_cost_integer
 # p_items['property_cost_currency'] = property_cost_currency
+# p_items['property_price'] = property_price
 # p_items['property_eircode'] = property_eircode
 # p_items['property_bedrooms'] = property_bedrooms
 # p_items['property_bathrooms'] = property_bathrooms

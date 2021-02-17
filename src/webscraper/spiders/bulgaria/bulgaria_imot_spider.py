@@ -14,12 +14,13 @@ from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
 from src.webscraper.normalization.process_photo import UploadPhoto
+from src.webscraper.normalization.currency_exchange import Currency
 
 
 logger = getLogger()
 
 
-class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto):
+class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto, Currency):
     logger.info('Launching Bulgaria spider...')
     name = 'Imot'
     start_urls = [
@@ -37,6 +38,7 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.storage_client = self.start_client_storage()
+        self.exchange_rates = self.collect_exchange_rate()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -108,10 +110,61 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto):
         #     property_coordinates = None
 
         """Property cost"""
-        property_cost = self.get_text(property_document_extract, '<strong style="color: #900">', "</strong>")
-        property_cost_integer = self.get_digits(property_cost)
-        property_cost_currency_get = self.get_letters(property_cost)
-        property_cost_currency = self.normalize_currency(property_cost_currency_get)
+        property_cost_extract = self.get_text(property_document_extract, '<strong style="color: #900">', "</strong>")
+        if 'При запитване' in property_cost_extract:
+            property_cost = None
+            property_cost_integer = None
+            property_cost_currency = None
+
+            property_price = {
+                'eur': {
+                    'amount': None,
+                    'currency_iso': None,
+                    'currency_symbol': None,
+                },
+                'source': {
+                    'amount': None,
+                    'currency_iso': None,
+                    'currency_symbol': None,
+                },
+                'price_last_update': datetime.utcnow(),
+            }
+
+        else:
+            property_cost = property_cost_extract
+            property_cost_integer = self.get_digits(property_cost)
+            property_cost_currency_get = self.get_letters(property_cost)
+            property_cost_currency = self.normalize_currency(property_cost_currency_get)
+
+            property_cost_currency_iso = self.normalize_currency_iso(property_cost_currency)
+            property_price_eur_amount = self.convert_price(
+                property_cost_integer, property_cost_currency_iso, self.exchange_rates
+            )
+
+            property_price = {
+                'eur': {
+                    'amount': int(property_price_eur_amount),
+                    'currency_iso': 'EUR',
+                    'currency_symbol': '€',
+                },
+                'source': {
+                    'amount': int(property_cost_integer),
+                    'currency_iso': property_cost_currency_iso,
+                    'currency_symbol': property_cost_currency,
+                },
+                'price_last_update': datetime.utcnow(),
+            }
+
+        """Bedrooms"""
+        property_bedrooms_extract = self.get_text(
+            property_document_extract, '<strong style="font-size:18px;">', '</strong>'
+        )
+        property_bedrooms_number = self.get_digits(property_bedrooms_extract)
+        property_bedrooms_check = property_bedrooms_number.isdigit()
+        if property_bedrooms_check:
+            property_bedrooms = property_bedrooms_number
+        else:
+            property_bedrooms = None
 
         """Property square"""
         property_square_extract = self.get_text(property_document_extract, 'Квадратура:', " ")
@@ -187,6 +240,8 @@ class BulgariaImotSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_cost'] = property_cost
         p_items['property_cost_integer'] = property_cost_integer
         p_items['property_cost_currency'] = property_cost_currency
+        p_items['property_price'] = property_price
+        p_items['property_bedrooms'] = property_bedrooms
         p_items['property_square'] = property_square
         p_items['property_type'] = property_type
         p_items['property_advertise_type'] = property_advertise_type

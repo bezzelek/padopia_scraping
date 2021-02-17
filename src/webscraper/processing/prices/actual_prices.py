@@ -12,7 +12,7 @@ def update_prices():
     query = {
         '$and': [
             {'property_price.price_last_update': {'$exists': True}},
-            {'property_price.currency_iso': {'$ne': 'EUR'}},
+            {'property_price.source.currency_iso': {'$ne': 'EUR'}},
         ]
     }
     sort = 'property_price.last_update', 1
