@@ -165,12 +165,8 @@ class TurkeyEmlakjetSpider(scrapy.Spider, Normalization, UploadPhoto):
             property_photo = None
 
         if property_photos_extract is not None:
-            property_photos_links = []
-            for element in property_photos_extract:
-                link = 'https://imaj.emlakjet.com' + element
-                property_photos_links.append(link)
-                property_photos = self.store_images(property_photos_links)
-                property_photo = property_photos[0]
+            property_photos = self.store_images(property_photos_extract)
+            property_photo = property_photos[0]
         else:
             property_photos = None
             property_photo = None
