@@ -26,7 +26,7 @@ check:
 ##
 ### Project shortcuts
 celery:
-	docker-compose run -d --rm scraper_launch celery -E -A root worker --beat --loglevel=info
+	docker-compose run -d --rm scraper_launch celery -A root worker --beat --loglevel=info
 
 ireland:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/ireland/ireland_daft_spider.py
@@ -77,7 +77,7 @@ thumbnail_main:
 ##
 ### Project shortcuts for debugging
 celery_test:
-	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
+	docker-compose run --rm scraper_launch celery -A root worker --beat --loglevel=info
 
 ireland_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/ireland/ireland_daft_spider.py
