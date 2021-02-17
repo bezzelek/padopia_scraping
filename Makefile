@@ -62,7 +62,7 @@ croatia:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/croatia/croatia_croatiaestate_spider.py
 
 accurate_address:
-	docker-compose run -d --rm scraper_launch python src/webscraper/normalization/accurate_address.py
+	docker-compose run -d --rm scraper_launch python src/webscraper/processing/addresses/accurate_address.py
 
 convert_prices:
 	docker-compose run -d --rm scraper_launch python src/webscraper/processing/prices/currency_convertation.py
@@ -113,7 +113,7 @@ croatia_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/croatia/croatia_croatiaestate_spider.py
 
 accurate_address_test:
-	docker-compose run --rm scraper_launch python src/webscraper/normalization/accurate_address.py
+	docker-compose run --rm scraper_launch python src/webscraper/processing/addresses/accurate_address.py
 
 convert_prices_test:
 	docker-compose run --rm scraper_launch python src/webscraper/processing/prices/currency_convertation.py
