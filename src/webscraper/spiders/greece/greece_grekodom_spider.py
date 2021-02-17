@@ -145,13 +145,9 @@ class GreeceGrekodomSpider(scrapy.Spider, Normalization, UploadPhoto):
         property_source_language = 'England'
         property_photos_section = self.get_text(property_script, 'royalSlider rsDefault', '</div>')
         property_photos_extract = self.get_list(property_photos_section, 'href="', '"')[1:]
-        property_photos_links = []
-        for element in property_photos_extract:
-            link = 'https:' + element
-            property_photos_links.append(link)
-        property_photos_check = self.check_if_exists(property_photos_links)
+        property_photos_check = self.check_if_exists(property_photos_extract)
         if property_photos_check is not None:
-            property_photos = self.store_images(property_photos_links)
+            property_photos = self.store_images(property_photos_extract)
             property_photo = property_photos[0]
         else:
             property_photos = None
@@ -195,9 +191,8 @@ class GreeceGrekodomSpider(scrapy.Spider, Normalization, UploadPhoto):
 
             agency_logo_extract = self.get_text(property_script, 'agent-image', 'alt')
             agency_logo_url = self.check_if_exists(self.get_text(agency_logo_extract, 'src="', '"'))
-            if agency_logo_url is not None:
-                agency_logo_link = 'https:' + agency_logo_url
-                agency_logo_list = [agency_logo_link]
+            if agency_logo_url is not None and 'http' in agency_logo_url:
+                agency_logo_list = [agency_logo_url]
                 agency_logo_store = self.store_images(agency_logo_list)
                 agency_logo = agency_logo_store[0]
             else:
