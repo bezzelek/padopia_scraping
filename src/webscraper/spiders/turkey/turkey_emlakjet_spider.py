@@ -15,12 +15,13 @@ from scrapy.utils.project import get_project_settings
 from src.webscraper.items import PropertyItem, AgencyItem
 from src.webscraper.normalization.data_normalization import Normalization
 from src.webscraper.normalization.process_photo import UploadPhoto
+from src.webscraper.normalization.currency_exchange import Currency
 
 
 logger = getLogger()
 
 
-class TurkeyEmlakjetSpider(scrapy.Spider, Normalization, UploadPhoto):
+class TurkeyEmlakjetSpider(scrapy.Spider, Normalization, UploadPhoto, Currency):
     logger.info('Launching Turkey Emlakjet spider...')
     name = 'Turkey Emlakjet'
     start_urls = [
@@ -38,6 +39,7 @@ class TurkeyEmlakjetSpider(scrapy.Spider, Normalization, UploadPhoto):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.storage_client = self.start_client_storage()
+        self.exchange_rates = self.collect_exchange_rate()
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
@@ -116,6 +118,25 @@ class TurkeyEmlakjetSpider(scrapy.Spider, Normalization, UploadPhoto):
         property_cost_integer = str(property_data['price']['value'])
         property_cost_currency = self.normalize_currency(property_data['price']['currency'])
 
+        property_cost_currency_iso = self.normalize_currency_iso(property_cost_currency)
+        property_price_eur_amount = self.convert_price(
+            property_cost_integer, property_cost_currency_iso, self.exchange_rates
+        )
+
+        property_price = {
+            'eur': {
+                'amount': int(property_price_eur_amount),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'source': {
+                'amount': int(property_cost_integer),
+                'currency_iso': property_cost_currency_iso,
+                'currency_symbol': property_cost_currency,
+            },
+            'price_last_update': datetime.utcnow(),
+        }
+
         """Property base info"""
         try:
             property_bathrooms_extract_dict = list(filter(lambda item: item['key'] == 'bath_count', property_info))[0]
@@ -193,6 +214,7 @@ class TurkeyEmlakjetSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_cost'] = property_cost
         p_items['property_cost_integer'] = property_cost_integer
         p_items['property_cost_currency'] = property_cost_currency
+        p_items['property_price'] = property_price
         p_items['property_bedrooms'] = property_bedrooms
         p_items['property_bathrooms'] = property_bathrooms
         p_items['property_square'] = property_square

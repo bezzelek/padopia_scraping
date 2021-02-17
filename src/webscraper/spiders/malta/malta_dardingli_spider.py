@@ -66,6 +66,7 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto):
         else:
             property_photos = None
             property_photo = None
+
         property_cost_extract = self.get_text(property_script, 'id="df_field_price">', '/span>')
         property_cost_pretty = self.get_text(property_cost_extract, '<span>', '<')
         property_cost = self.check_if_exists(property_cost_pretty)
@@ -73,6 +74,20 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto):
         property_cost_currency_pretty = self.get_no_punctuation(property_cost)
         property_cost_currency_get = self.get_letters(property_cost_currency_pretty)
         property_cost_currency = self.normalize_currency(property_cost_currency_get)
+        property_price = {
+            'eur': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'source': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'price_last_update': datetime.utcnow(),
+        }
+
         property_bedrooms_extract = self.get_text(property_script, 'class="badrooms">', '</span>')
         property_bedrooms = self.check_if_exists(property_bedrooms_extract)
         property_bathrooms_extract = self.get_text(property_script, 'class="bathrooms">', '</span>')
@@ -166,6 +181,7 @@ class MaltaDardingliSpider(scrapy.Spider, Normalization, UploadPhoto):
         items['property_cost'] = property_cost
         items['property_cost_integer'] = property_cost_integer
         items['property_cost_currency'] = property_cost_currency
+        items['property_price'] = property_price
         items['property_bedrooms'] = property_bedrooms
         items['property_bathrooms'] = property_bathrooms
         items['property_square'] = property_square

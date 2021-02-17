@@ -7,9 +7,19 @@ class Normalization:
             else '$' if value == '$'
             else 'лв' if value == 'лв.'
             else '₺' if value == 'TL'
-            else 'Other'
+            else None
         )
         return result
+
+    def normalize_currency_iso(self, value):
+        currency_to_iso = (
+            'EUR' if value == '€'
+            else 'USD' if value == '$'
+            else 'BGN' if value == 'лв'
+            else 'TRY' if value == '₺'
+            else None
+        )
+        return currency_to_iso
 
     def normalize_advertise_type(self, value):
         result = (
@@ -18,11 +28,13 @@ class Normalization:
                       or value == 1
                       or value == 'acheter'
                       or value == 'For sale'
+                      or value == 'BUY'
             else 'Rent' if value == 'Rent'
                            or value == 'rent'
                            or value == 2
                            or value == 'louer'
                            or value == 'For rent'
+                           or value == 'RENT'
             else 'Auction' if value == 'auction'
             else 'Other'
         )
@@ -75,6 +87,10 @@ class Normalization:
                             or value == 'bina'
                             or value == 'kosk'
                             or value == '2 - House / Villa'
+                            or value == 'HOUSECHALET'
+                            or value == 'HOUSE'
+                            or value == 'HOUSERURAL_HOUSE'
+                            or value == 'HOUSEROW_HOUSE'
             else 'Palace' if value == 'Palace/Castle/Manor'
                              or value == 'Château'
             else 'Penthouse' if value == 'Penthouse'
@@ -85,6 +101,7 @@ class Normalization:
             else 'Villa' if value == 'Villa'
                             or value == 'villa-imarli'
                             or value == 'villa'
+                            or value == 'HOUSEVILLA'
             else 'Bungalow' if value == 'Bungalow'
             else 'Boathouse' if value == 'Boathouse'
             else 'Detached' if value == 'Detached'
@@ -115,17 +132,23 @@ class Normalization:
                                 or value == 'apartman-dairesi'
                                 or value == 'toplu-konut-icin'
                                 or value == '1 - Apartment'
+                                or value == 'FLATAPARTMENT'
             else 'Flat' if value == 'Flat'
                            or value == 'Chambre'
+                           or value == 'FLAT'
             else 'Attic' if value == 'Attic'
+                            or value == 'FLATATTIC'
             else 'Penthouse' if value == 'Penthouse'
             else 'Duplex apartment' if value == 'Duplex apartment'
                                        or value == 'Duplex'
                                        or value == 'kooperatif'
+                                       or value == 'FLATDUPLEX'
             else 'Loft' if value == 'Loft'
+                           or value == 'FLATLOFT'
             else 'Studio' if value == 'Studio'
                              or value == 'Study'
                              or value == 'Studio Apartment'
+                             or value == 'FLATSTUDY'
             else 'Room' if value == 'Room'
                            or value == 'devremulk'
             else 'Maisonette' if value == 'Maisonette'
@@ -169,7 +192,7 @@ class Normalization:
 
             else 'Parking Space' if value == 'Garage/Parking Space'
 
-            else 'Other'
+            else value
         )
         return result
 
