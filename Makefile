@@ -43,6 +43,9 @@ spain_fotocasa:
 spain_idealista:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/spain_idealista_property_spider.py
 
+spain_yaencontre:
+	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/spain/spain_yaencontre_spider.py
+
 italy:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/italy/italy_immobiliare_spider.py
 
@@ -90,6 +93,9 @@ spain_fotocasa_test:
 
 spain_idealista_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain_idealista_property_spider.py
+
+spain_yaencontre_test:
+	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain/spain_yaencontre_spider.py
 
 italy_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/italy/italy_immobiliare_spider.py
