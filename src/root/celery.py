@@ -14,6 +14,7 @@ from webscraper.spiders.ireland.ireland_daft_spider import IrelandDaftScraper
 from webscraper.spiders.italy.italy_immobiliare_spider import ItalyImmobiliareScraper
 from webscraper.spiders.malta.malta_dardingli_spider import MaltaDardingliScraper
 from webscraper.spiders.spain.spain_fotocasa_spider import SpainFotocasaScraper
+from webscraper.spiders.spain.spain_yaencontre_spider import SpainYaencontreScraper
 from webscraper.spiders.spain_idealista_property_spider import SpainIdealistaPropertyScraper
 from webscraper.spiders.turkey.turkey_emlakjet_spider import TurkeyEmlakjetScraper
 
@@ -31,85 +32,91 @@ app.conf.update({
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(hour=6, minute=40),
+        crontab(hour=13, minute=40),
         run_make_thumbnails.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=6, minute=45),
+        crontab(hour=13, minute=45),
         run_convert_currency.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=6, minute=50),
+        crontab(hour=13, minute=50),
         run_update_prices.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=6, minute=55),
+        crontab(hour=13, minute=55),
         run_accurate_address.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=0, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=0, day_of_week='mon,wed,fri'),
         run_bulgaria_imot.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=1, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=1, day_of_week='mon,wed,fri'),
         run_croatia_croatiaestate.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=2, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=2, day_of_week='mon,wed,fri'),
         run_france_immobilier.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=3, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=3, day_of_week='mon,wed,fri'),
         run_greece_grekodom.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=4, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=4, day_of_week='mon,wed,fri'),
         run_ireland_daft.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=5, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=5, day_of_week='mon,wed,fri'),
         run_italy_immobiliare.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=6, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=6, day_of_week='mon,wed,fri'),
         run_malta_dardingli.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=7, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=7, day_of_week='mon,wed,fri'),
         run_turkey_emlakjet.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=8, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=8, day_of_week='mon,wed,fri'),
+        run_spain_yaencontre.s(),
+        time_limit=60 * 60 * 47
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=14, minute=9, day_of_week='mon,wed,fri'),
         run_spain_fotocasa.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=7, minute=9, day_of_week='mon,wed,fri'),
+        crontab(hour=14, minute=10, day_of_week='mon,wed,fri'),
         run_spain_idealista.s(),
         time_limit=60 * 60 * 47
     )
@@ -192,4 +199,10 @@ def run_spain_fotocasa():
 @app.task
 def run_spain_idealista():
     scraper = SpainIdealistaPropertyScraper()
+    scraper.run_spiders()
+
+
+@app.task
+def run_spain_yaencontre():
+    scraper = SpainYaencontreScraper()
     scraper.run_spiders()
