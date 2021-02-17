@@ -9,6 +9,7 @@ COPY ["requirements.txt", "/app/"]
 RUN apk add --update --no-cache make bash libpq
 RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN apk add --update --no-cache g++ gcc libxslt-dev
+RUN apk add --no-cache zlib-dev jpeg-dev
 RUN apk add --no-cache --virtual build \
     build-base \
     musl-dev \

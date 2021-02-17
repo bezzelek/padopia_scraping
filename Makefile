@@ -28,12 +28,6 @@ check:
 celery:
 	docker-compose run -d --rm scraper_launch celery -E -A root worker --beat --loglevel=info
 
-accurate_address:
-	docker-compose run -d --rm scraper_launch python src/webscraper/normalization/accurate_address.py
-
-spain_property:
-	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/spain/spain_idealista_property_spider.py
-
 ireland:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/ireland/ireland_daft_spider.py
 
@@ -64,6 +58,9 @@ turkey:
 croatia:
 	docker-compose run -d --rm scraper_launch python src/webscraper/spiders/croatia/croatia_croatiaestate_spider.py
 
+accurate_address:
+	docker-compose run -d --rm scraper_launch python src/webscraper/normalization/accurate_address.py
+
 convert_prices:
 	docker-compose run -d --rm scraper_launch python src/webscraper/processing/prices/currency_convertation.py
 
@@ -78,12 +75,6 @@ thumbnail_main:
 ### Project shortcuts for debugging
 celery_test:
 	docker-compose run --rm scraper_launch celery -E -A root worker --beat --loglevel=info
-
-accurate_address_test:
-	docker-compose run --rm scraper_launch python src/webscraper/normalization/accurate_address.py
-
-spain_property_test:
-	docker-compose run --rm scraper_launch python src/webscraper/spiders/spain/spain_idealista_property_spider.py
 
 ireland_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/ireland/ireland_daft_spider.py
@@ -115,13 +106,16 @@ turkey_test:
 croatia_test:
 	docker-compose run --rm scraper_launch python src/webscraper/spiders/croatia/croatia_croatiaestate_spider.py
 
-convert_prices:
+accurate_address_test:
+	docker-compose run --rm scraper_launch python src/webscraper/normalization/accurate_address.py
+
+convert_prices_test:
 	docker-compose run --rm scraper_launch python src/webscraper/processing/prices/currency_convertation.py
 
-update_prices:
+update_prices_test:
 	docker-compose run --rm scraper_launch python src/webscraper/processing/prices/actual_prices.py
 
-thumbnail_main:
+thumbnail_main_test:
 	docker-compose run --rm scraper_launch python src/webscraper/processing/images/thumbnail_main_image.py
 
 #
