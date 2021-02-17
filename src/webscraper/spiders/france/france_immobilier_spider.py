@@ -22,7 +22,7 @@ class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto):
     logger.info('Launching France Immobilier spider...')
     name = 'France Immobilier'
     start_urls = [
-        'https://immobilier.lefigaro.fr/sitemap_index.xml'
+        'https://immobilier.lefigaro.fr/'
     ]
 
     custom_settings = {
@@ -39,53 +39,33 @@ class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto):
 
     def parse(self, response, **kwargs):
         logger.info('Starting to scrap...')
-        body_extract = response.text
-        sitemap_extract = self.get_list(body_extract, '<loc>', '</loc>')[1:]
+        target_urls = response.xpath('//div[@class="container-groups"]/ul/li/a/@href').extract()
 
-        sitemap_records = []
-        for element in sitemap_extract:
-            if 'annonce' in element:
-                sitemap_records.append(element)
+        for link in target_urls:
+            url = 'https://immobilier.lefigaro.fr' + link
+            yield scrapy.Request(url=url, callback=self.parse_targets)
 
-        recent_announce = []
-        for element in sitemap_records:
-            link = element
-            try:
-                number = int(self.get_text(element, 'annonce-', '.xml'))
-                item = {
-                    'link': link,
-                    'number': number,
-                }
-                recent_announce.append(item)
-            except:
-                pass
+    def parse_targets(self, response, **kwargs):
+        target_links = []
+        target_links.append(response.url)
 
-        new_announce = []
-        for element in sitemap_records:
-            if 'new' in element:
-                link = element
-                number = self.get_text(element, 'new-', '.xml')
-                item = {
-                    'link': link,
-                    'number': number,
-                }
-                new_announce.append(item)
+        extract_urls = response.xpath('//div[@class="facets-container-links"]/nav/div/ul/li/a/@href').extract()
+        for link in extract_urls:
+            url = 'https://immobilier.lefigaro.fr' + link
+            target_links.append(url)
 
-        max_recent_item = max(recent_announce, key=itemgetter('number'))
-        max_recent = max_recent_item['link']
-        max_new_item = max(new_announce, key=itemgetter('number'))
-        max_new = max_new_item['link']
+        for link in target_links:
+            yield scrapy.Request(url=link, callback=self.parse_search)
 
-        links = [max_recent, max_new]
+    def parse_search(self, response, **kwargs):
+        property_urls = response.xpath('//section[@class="bloc-annonces"]/div/div[2]/div[1]/a/@href').extract()
+        for link in property_urls:
+            yield scrapy.Request(url=link, callback=self.parse_property_content)
 
-        for link in links:
-            yield scrapy.Request(url=link, callback=self.parse_sitemap, priority=10)
-
-    def parse_sitemap(self, response, **kwargs):
-        body_extract = response.text
-        sitemap_extract = self.get_list(body_extract, '<loc>', '</loc>')[1:]
-        for link in sitemap_extract:
-            yield scrapy.Request(url=link, callback=self.parse_property_content, priority=200)
+        next_page_extract = response.xpath('//a[@rel="next"]/@href').get()
+        if next_page_extract is not None:
+            next_page = 'https://immobilier.lefigaro.fr' + next_page_extract
+            yield response.follow(next_page, callback=self.parse_search)
 
     def parse_property_content(self, response, **kwargs):
         p_items = PropertyItem()
