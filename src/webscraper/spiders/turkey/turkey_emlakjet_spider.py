@@ -108,10 +108,27 @@ class TurkeyEmlakjetSpider(scrapy.Spider, Normalization, UploadPhoto, Currency):
         city = property_data['location']['city']['name']
         lim = ', '
         property_address = district + lim + town + lim + city
-        property_coordinates = {
-            'longitude': str(property_data['location']['coordinates']['lon']),
-            'latitude': str(property_data['location']['coordinates']['lat'])
-        }
+
+        property_longitude = str(property_data['location']['coordinates']['lon'])
+        property_latitude = str(property_data['location']['coordinates']['lat'])
+        longitude = self.check_if_exists(property_longitude)
+        latitude = self.check_if_exists(property_latitude)
+
+        if longitude is not None and latitude is not None:
+            property_coordinates = {
+                'latitude': latitude,
+                'longitude': longitude,
+            }
+            property_geo = {
+                'type': 'Point',
+                'coordinates': [
+                    float(longitude),
+                    float(latitude)
+                ]
+            }
+        else:
+            property_coordinates = None
+            property_geo = None
 
         """Property cost"""
         property_cost = str(property_data['price']['value']) + ' ' + property_data['price']['currency']
@@ -225,6 +242,7 @@ class TurkeyEmlakjetSpider(scrapy.Spider, Normalization, UploadPhoto, Currency):
         p_items['property_photo'] = property_photo
         p_items['property_photos'] = property_photos
         p_items['property_coordinates'] = property_coordinates
+        p_items['property_geo'] = property_geo
         p_items['property_renewed'] = property_renewed
         p_items['property_agency'] = property_agency
         p_items['property_agency_link'] = property_agency_link

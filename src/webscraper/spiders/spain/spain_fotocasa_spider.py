@@ -8,10 +8,10 @@ from datetime import datetime
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
-from src.webscraper.items import PropertyItem, AgencyItem
-from src.webscraper.normalization.data_normalization import Normalization
-from src.webscraper.normalization.process_photo import UploadPhoto
 from webscraper.proxies import get_proxies
+from src.webscraper.items import PropertyItem, AgencyItem
+from src.webscraper.normalization.process_photo import UploadPhoto
+from src.webscraper.normalization.data_normalization import Normalization
 
 
 logger = getLogger()
@@ -104,6 +104,21 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
         property_cost_currency_pretty = self.get_no_punctuation(property_cost)
         property_cost_currency_get = self.get_letters(property_cost_currency_pretty)
         property_cost_currency = self.normalize_currency(property_cost_currency_get)
+
+        property_price = {
+            'eur': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'source': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'price_last_update': datetime.utcnow(),
+        }
+
         features_info_extract = self.get_list(script, 're-DetailFeaturesList-featureLabe', 'div>')
         property_features_extract = []
         for item in features_info_extract:
@@ -147,6 +162,7 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
             property_photos = None
             property_photo = None
         address_script = self.get_text(script, 'window.__INITIAL_PROPS__', ';', )
+
         coordinates_data = self.get_list(address_script, '{', '}')
         latitude_extract = self.get_if_element_in(
             coordinates_data, '\\"latitude\\":', ',', 'latitude'
@@ -154,15 +170,24 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
         longitude_extract = self.get_if_element_in(
             coordinates_data, '"longitude\\":', ',', 'longitude'
         )
-        latitude_check = self.check_if_exists(latitude_extract)
-        longitude_check = self.check_if_exists(longitude_extract)
-        if latitude_check is not None and longitude_check is not None:
+        latitude = self.check_if_exists(latitude_extract)
+        longitude = self.check_if_exists(longitude_extract)
+        if latitude is not None and longitude is not None:
             property_coordinates = {
-                'latitude': latitude_check,
-                'longitude': longitude_check,
+                'latitude': latitude,
+                'longitude': longitude,
+            }
+            property_geo = {
+                'type': 'Point',
+                'coordinates': [
+                    float(longitude),
+                    float(latitude)
+                ]
             }
         else:
             property_coordinates = None
+            property_geo = None
+
         property_address_extract = self.get_text(script, 're-Breadcrumb-text">', '</span>')
         property_address_check = self.check_if_exists(property_address_extract)
         property_province_extract = self.get_list(script, 're-Breadcrumb-link"', '</li>')
@@ -205,6 +230,7 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
         items['property_cost'] = property_cost
         items['property_cost_integer'] = property_cost_integer
         items['property_cost_currency'] = property_cost_currency
+        items['property_price'] = property_price
         items['property_bedrooms'] = property_bedrooms
         items['property_bathrooms'] = property_bathrooms
         items['property_square'] = property_square
@@ -215,6 +241,7 @@ class SpainFotocasaSpider(scrapy.Spider, Normalization, UploadPhoto):
         items['property_features'] = property_features
         items['property_facilities'] = property_facilities
         items['property_coordinates'] = property_coordinates
+        items['property_geo'] = property_geo
         items['property_photo'] = property_photo
         items['property_photos'] = property_photos
         items['property_renewed'] = property_renewed

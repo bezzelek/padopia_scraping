@@ -135,12 +135,25 @@ class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto):
         property_description_source = self.get_text(property_script, 'data-description="', '"')
 
         """Address"""
-        latitude = self.get_text(property_script, 'data-classified-latitude="', '"')
-        longitude = self.get_text(property_script, 'data-classified-longitude="', '"')
-        property_coordinates = {
-            'latitude': latitude,
-            'longitude': longitude,
-        }
+        longitude_extract = self.get_text(property_script, 'data-classified-longitude="', '"')
+        latitude_extract = self.get_text(property_script, 'data-classified-latitude="', '"')
+        longitude = self.check_if_exists(longitude_extract)
+        latitude = self.check_if_exists(latitude_extract)
+        if longitude is not None and latitude is not None:
+            property_coordinates = {
+                'latitude': latitude,
+                'longitude': longitude,
+            }
+            property_geo = {
+                'type': 'Point',
+                'coordinates': [
+                    float(longitude),
+                    float(latitude)
+                ]
+            }
+        else:
+            property_coordinates = None
+            property_geo = None
 
         property_code = self.get_digits(property_link)
         rest_link = 'https://immobilier.lefigaro.fr/rest/classifieds/' + property_code
@@ -204,6 +217,7 @@ class FranceImmobilierSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_photo'] = property_photo
         p_items['property_photos'] = property_photos
         p_items['property_coordinates'] = property_coordinates
+        p_items['property_geo'] = property_geo
         p_items['property_renewed'] = property_renewed
         p_items['property_agency'] = property_agency
         p_items['property_agency_link'] = property_agency_link
