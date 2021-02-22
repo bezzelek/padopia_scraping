@@ -30,6 +30,7 @@ class PropertyItem(scrapy.Item):
     property_photo = scrapy.Field()
     property_photos = scrapy.Field()
     property_coordinates = scrapy.Field()
+    property_geo = scrapy.Field()
     property_renewed = scrapy.Field()
     property_shorter = scrapy.Field()
     property_agent = scrapy.Field()
@@ -82,6 +83,7 @@ class AgencyItem(scrapy.Item):
 # p_items['property_photo'] = property_photo
 # p_items['property_photos'] = property_photos
 # p_items['property_coordinates'] = property_coordinates
+# p_items['property_geo'] = property_geo
 # p_items['property_renewed'] = property_renewed
 # p_items['property_shorter'] = property_shorter
 # p_items['property_agent'] = property_agent

@@ -119,8 +119,16 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
                 'latitude': latitude,
                 'longitude': longitude,
             }
+            property_geo = {
+                'type': 'Point',
+                'coordinates': [
+                    float(longitude),
+                    float(latitude)
+                ]
+            }
         else:
             property_coordinates = None
+            property_geo = None
 
         city = data['listing']['properties'][0]['location']['city']['name']
         province = data['listing']['properties'][0]['location']['province']['name']
@@ -194,6 +202,7 @@ class ItalyImmobiliareSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_photo'] = property_photo
         p_items['property_photos'] = property_photos
         p_items['property_coordinates'] = property_coordinates
+        p_items['property_geo'] = property_geo
         p_items['property_renewed'] = property_renewed
         p_items['property_agency'] = property_agency
         p_items['property_agency_link'] = property_agency_link
