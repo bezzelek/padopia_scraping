@@ -3,6 +3,7 @@ from celery.schedules import crontab
 
 from root.settings import BROKER_URL, CELERY_WORKERS
 from webscraper.processing.addresses.accurate_address import accurate_address
+from webscraper.processing.geospatial.mongo_geo import create_mongodb_geo_object
 from webscraper.processing.images.thumbnail_main_image import make_thumbnails
 from webscraper.processing.prices.actual_prices import update_prices
 from webscraper.processing.prices.currency_convertation import convert_currency
@@ -32,91 +33,97 @@ app.conf.update({
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(hour=15, minute=40),
+        crontab(hour=18, minute=55),
+        run_mongodb_geo_object.s(),
+        time_limit=60 * 60 * 23
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=18, minute=56),
         run_make_thumbnails.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=15, minute=45),
+        crontab(hour=18, minute=57),
         run_convert_currency.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=15, minute=50),
+        crontab(hour=18, minute=58),
         run_update_prices.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=15, minute=55),
+        crontab(hour=18, minute=59),
         run_accurate_address.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=0, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=0, day_of_week='mon,wed,fri'),
         run_bulgaria_imot.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=1, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=1, day_of_week='mon,wed,fri'),
         run_croatia_croatiaestate.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=2, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=2, day_of_week='mon,wed,fri'),
         run_france_immobilier.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=3, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=3, day_of_week='mon,wed,fri'),
         run_greece_grekodom.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=4, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=4, day_of_week='mon,wed,fri'),
         run_ireland_daft.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=5, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=5, day_of_week='mon,wed,fri'),
         run_italy_immobiliare.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=6, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=6, day_of_week='mon,wed,fri'),
         run_malta_dardingli.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=7, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=7, day_of_week='mon,wed,fri'),
         run_turkey_emlakjet.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=8, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=8, day_of_week='mon,wed,fri'),
         run_spain_yaencontre.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=9, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=9, day_of_week='mon,wed,fri'),
         run_spain_fotocasa.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=16, minute=10, day_of_week='mon,wed,fri'),
+        crontab(hour=19, minute=10, day_of_week='mon,wed,fri'),
         run_spain_idealista.s(),
         time_limit=60 * 60 * 47
     )
@@ -140,6 +147,11 @@ def run_update_prices():
 @app.task
 def run_make_thumbnails():
     make_thumbnails()
+
+
+@app.task
+def run_mongodb_geo_object():
+    create_mongodb_geo_object()
 
 
 @app.task

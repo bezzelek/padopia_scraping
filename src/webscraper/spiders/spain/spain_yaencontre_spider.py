@@ -99,17 +99,45 @@ class SpainYaencontreSpider(scrapy.Spider, Normalization, UploadPhoto):
         )
         property_address = property_address_extract + ', ' + property_website_country
         property_coordinates_extract = self.get_text(property_script, 'operation', 'images')
-        property_lat = str(self.get_text(property_coordinates_extract, '"lat\\":', ','))
-        property_lon = str(self.get_text(property_coordinates_extract, '"lon\\":', '},'))
-        property_coordinates = {
-            'latitude': property_lat,
-            'longitude': property_lon,
-        }
+        property_longitude = str(self.get_text(property_coordinates_extract, '"lon\\":', '},'))
+        property_latitude = str(self.get_text(property_coordinates_extract, '"lat\\":', ','))
+        longitude = self.check_if_exists(property_longitude)
+        latitude = self.check_if_exists(property_latitude)
+
+        if longitude is not None and latitude is not None:
+            property_coordinates = {
+                'latitude': latitude,
+                'longitude': longitude,
+            }
+            property_geo = {
+                'type': 'Point',
+                'coordinates': [
+                    float(longitude),
+                    float(latitude)
+                ]
+            }
+        else:
+            property_coordinates = None
+            property_geo = None
 
         """Cost"""
         property_cost_integer = self.get_text(property_script, '"price\\":', ',')
         property_cost_currency = '€'
         property_cost = property_cost_integer + ' ' + property_cost_currency
+
+        property_price = {
+            'eur': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'source': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'price_last_update': datetime.utcnow(),
+        }
 
         """Basic info"""
         property_bedrooms_extract = self.get_text(property_script, '"rooms\\":', ',')
@@ -174,6 +202,7 @@ class SpainYaencontreSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_cost'] = property_cost
         p_items['property_cost_integer'] = property_cost_integer
         p_items['property_cost_currency'] = property_cost_currency
+        p_items['property_price'] = property_price
         p_items['property_bedrooms'] = property_bedrooms
         p_items['property_bathrooms'] = property_bathrooms
         p_items['property_square'] = property_square
@@ -184,6 +213,7 @@ class SpainYaencontreSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_photo'] = property_photo
         p_items['property_photos'] = property_photos
         p_items['property_coordinates'] = property_coordinates
+        p_items['property_geo'] = property_geo
         p_items['property_renewed'] = property_renewed
         p_items['property_agency'] = property_agency
         p_items['property_agency_link'] = property_agency_link

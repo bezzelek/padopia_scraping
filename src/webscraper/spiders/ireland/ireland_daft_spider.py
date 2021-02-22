@@ -125,12 +125,26 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
 
         property_renewed_extract = final_data['lastUpdateDate']
         property_renewed = self.check_if_exists(property_renewed_extract)
-        latitude = final_data['point']['coordinates'][1]
-        longitude = final_data['point']['coordinates'][0]
+        latitude_extract = final_data['point']['coordinates'][1]
+        longitude_extract = final_data['point']['coordinates'][0]
         property_coordinates_extract = {
-            'latitude': latitude,
-            'longitude': longitude,
+            'latitude': latitude_extract,
+            'longitude': longitude_extract,
         }
+
+        longitude = self.check_if_exists(longitude_extract)
+        latitude = self.check_if_exists(latitude_extract)
+        if longitude is not None and latitude is not None:
+            property_geo = {
+                'type': 'Point',
+                'coordinates': [
+                    float(longitude),
+                    float(latitude)
+                ]
+            }
+        else:
+            property_geo = None
+
         property_coordinates = self.check_if_exists(property_coordinates_extract)
         try:
             property_square_extract = final_data['floorArea']['value']
@@ -197,6 +211,7 @@ class IrelandDaftSpider(scrapy.Spider, Normalization, UploadPhoto):
         p_items['property_facilities'] = property_facilities
         p_items['property_features'] = property_features
         p_items['property_coordinates'] = property_coordinates
+        p_items['property_geo'] = property_geo
         p_items['property_photo'] = property_photo
         p_items['property_photos'] = property_photos
         p_items['property_renewed'] = property_renewed

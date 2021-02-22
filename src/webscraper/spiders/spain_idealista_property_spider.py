@@ -2,21 +2,23 @@ import os
 
 import scrapy
 
+from shutil import which
 from logging import getLogger
 from datetime import datetime
-from shutil import which
 
 from scrapy.crawler import CrawlerProcess
-from scrapy.utils.project import get_project_settings
 from scrapy_selenium import SeleniumRequest
+from scrapy.utils.project import get_project_settings
 
-from src.webscraper.items import PropertyItem
 from webscraper.proxies import get_proxies
+from src.webscraper.items import PropertyItem
+from src.webscraper.normalization.data_normalization import Normalization
+
 
 logger = getLogger()
 
 
-class SpainIdealistaPropertySpider(scrapy.Spider):
+class SpainIdealistaPropertySpider(scrapy.Spider, Normalization):
     logger.info('Launching Spain spider...')
     name = 'spain'
     start_urls = [
@@ -114,6 +116,21 @@ class SpainIdealistaPropertySpider(scrapy.Spider):
         property_cost = ''.join(property_cost_extract).strip()
         property_cost_integer = ''.join([number for number in property_cost if number.isdigit()])
         property_cost_currency = property_cost[-1]
+
+        property_price = {
+            'eur': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'source': {
+                'amount': int(property_cost_integer),
+                'currency_iso': 'EUR',
+                'currency_symbol': '€',
+            },
+            'price_last_update': datetime.utcnow(),
+        }
+
         property_bedrooms_extract = response.xpath(
             '//p[@class="info-data txt-big"]/span[2]/span/text()').extract()  # //div[@class="info-features"]/span[2]/span/text()
         property_bedrooms = ''.join(property_bedrooms_extract).strip()
@@ -143,10 +160,29 @@ class SpainIdealistaPropertySpider(scrapy.Spider):
             for image in property_script.split('imageDataService:"')
         ][1:]
         property_photo = property_photos[0]
-        property_coordinates = {
-            'latitude': property_script.split('latitude:"')[1].split('"')[0],
-            'longitude': property_script.split('longitude:"')[1].split('"')[0],
-        }
+
+        longitude_extract = property_script.split('latitude:"')[1].split('"')[0]
+        latitude_extract = property_script.split('longitude:"')[1].split('"')[0]
+
+        longitude = self.check_if_exists(longitude_extract)
+        latitude = self.check_if_exists(latitude_extract)
+        if longitude is not None and latitude is not None:
+
+            property_coordinates = {
+                'longitude': longitude,
+                'latitude': latitude,
+            }
+            property_geo = {
+                'type': 'Point',
+                'coordinates': [
+                    float(longitude),
+                    float(latitude)
+                ]
+            }
+        else:
+            property_geo = None
+            property_coordinates = None
+
         property_renewed_extract = response.xpath('//*[@id="stats"]/p/text()').extract()
         property_renewed = ''.join(property_renewed_extract).strip()
         property_agent_extract = response.xpath("//div/a[@class='about-advertiser-name']/text()").extract()
@@ -172,6 +208,7 @@ class SpainIdealistaPropertySpider(scrapy.Spider):
         items['property_cost'] = property_cost
         items['property_cost_integer'] = property_cost_integer
         items['property_cost_currency'] = property_cost_currency
+        items['property_price'] = property_price
         items['property_bedrooms'] = property_bedrooms
         items['property_bathrooms'] = property_bathrooms
         items['property_square'] = property_square
@@ -182,6 +219,7 @@ class SpainIdealistaPropertySpider(scrapy.Spider):
         items['property_photo'] = property_photo
         items['property_photos'] = property_photos
         items['property_coordinates'] = property_coordinates
+        items['property_geo'] = property_geo
         items['property_renewed'] = property_renewed
         items['property_agent'] = property_agent
         items['property_agent_photo'] = property_agent_photo
