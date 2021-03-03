@@ -33,97 +33,97 @@ app.conf.update({
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(hour=18, minute=55),
+        crontab(hour=14, minute=50),
         run_mongodb_geo_object.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=18, minute=56),
+        crontab(hour=14, minute=52),
         run_make_thumbnails.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=18, minute=57),
+        crontab(hour=14, minute=54),
         run_convert_currency.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=18, minute=58),
+        crontab(hour=14, minute=56),
         run_update_prices.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=18, minute=59),
+        crontab(hour=14, minute=58),
         run_accurate_address.s(),
         time_limit=60 * 60 * 23
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=0, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=0, day_of_week='mon,wed,fri'),
         run_bulgaria_imot.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=1, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=2, day_of_week='mon,wed,fri'),
         run_croatia_croatiaestate.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=2, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=4, day_of_week='mon,wed,fri'),
         run_france_immobilier.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=3, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=6, day_of_week='mon,wed,fri'),
         run_greece_grekodom.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=4, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=8, day_of_week='mon,wed,fri'),
         run_ireland_daft.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=5, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=10, day_of_week='mon,wed,fri'),
         run_italy_immobiliare.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=6, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=12, day_of_week='mon,wed,fri'),
         run_malta_dardingli.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=7, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=14, day_of_week='mon,wed,fri'),
         run_turkey_emlakjet.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=8, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=16, day_of_week='mon,wed,fri'),
         run_spain_yaencontre.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=9, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=18, day_of_week='mon,wed,fri'),
         run_spain_fotocasa.s(),
         time_limit=60 * 60 * 47
     )
 
     sender.add_periodic_task(
-        crontab(hour=19, minute=10, day_of_week='mon,wed,fri'),
+        crontab(hour=15, minute=20, day_of_week='mon,wed,fri'),
         run_spain_idealista.s(),
         time_limit=60 * 60 * 47
     )
