@@ -21,6 +21,7 @@ CurrencyConverter==0.14.4
 
 # Schudeler
 celery==5.0.5
+schedule==1.0.0
 
 # Database
 pymongo==3.11.1
